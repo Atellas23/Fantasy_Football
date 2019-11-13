@@ -26,13 +26,15 @@ struct Player {
 };
 
 vector<Player> database;
+int n1,n2,n3,t,j;
 
 void write() {
 
 }
 
 void read_consult(string& filename) {
-
+	ifstream in(filename);
+	in >> n1 >> n2 >> n3 >> t >> j;
 }
 
 void read_database(string& filename) {
