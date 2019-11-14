@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#incldue <cassert>
+#include <cassert>
 
 using namespace std;
 
@@ -21,12 +21,51 @@ int getId() {
 struct Player {
 	string name, id, pos, club;
 	int npos, price, points;
-	Player(string name, string pos, int price, string club, int point):
+	Player(string name, string pos, int price, string club, int points):
     name(name), id(getId()), pos(pos), npos(getpos(pos)), price(price), club(club), points(points) {}
+
+	// OPERADORS
+	bool operator< (const Player& j2) {
+		if (point == j2.point) return price < j2.price;
+		return points < j2.points;
+	}
+
+	bool operator<= (const Player& j2) {
+		return point <= j2.points;
+	}
+
+	bool operator> (const Player& j2) {
+		return point > j2.point;
+	}
+
+	bool operator>= (const Player& j2) {
+		return point >= j2.point;
+	}
+
+	bool operator== (const Player& j2) {
+		return point == j2.point;
+	}
+};
+
+struct Alineacio {
+	vector<Player> aln;
+	int n1, n2, n3, total_points, price;
+	bool operator< (const Alineacio& a2) {
+		return total_points < a2.total_points;
+	}
+	bool operator> (const Alineacio& a2) {
+		return total_points > a2.total_points;
+	}
+	bool operator== (const Alineacio& a2) {
+		return total_points == a2.total_points;
+	}
+	Player& operator[] (int idx) {
+		return aln[idx];
+	}
 };
 
 vector<Player> database;
-int n1,n2,n3,t,j;
+int n1, n2, n3, t, j;
 
 void write() {
 
