@@ -1,11 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <algorithm>
+#include <ctime>
 #include <cassert>
 
 using namespace std;
 
-int count = 0;
+int pl_count = 0, al_count = 0;
 
 int getpos(string& pos) {
 	if (pos == "por") return 0;
@@ -14,61 +16,96 @@ int getpos(string& pos) {
 	else return 3;
 }
 
-int getId() {
-	return count++;
+int getPlayerId() {
+	return pl_count++;
+}
+
+int getAlignmentId() {
+  return al_count++;
 }
 
 struct Player {
-	string name, id, pos, club;
-	int npos, price, points;
+	string name, pos, club;
+	int id, npos, price, points;
 	Player(string name, string pos, int price, string club, int points):
-    name(name), id(getId()), pos(pos), npos(getpos(pos)), price(price), club(club), points(points) {}
+    name(name), pos(pos), club(club), id(getPlayerId()), npos(getpos(pos)), price(price), points(points) {}
 
 	// OPERADORS
 	bool operator< (const Player& j2) {
-		if (point == j2.point) return price < j2.price;
+		if (points == j2.points) return price < j2.price;
 		return points < j2.points;
 	}
 
 	bool operator<= (const Player& j2) {
-		return point <= j2.points;
+		return points <= j2.points;
 	}
 
 	bool operator> (const Player& j2) {
-		return point > j2.point;
+		return points > j2.points;
 	}
 
 	bool operator>= (const Player& j2) {
-		return point >= j2.point;
+		return points >= j2.points;
 	}
 
 	bool operator== (const Player& j2) {
-		return point == j2.point;
+		return points == j2.points;
 	}
 };
 
-struct Alineacio {
+struct Alignment {
 	vector<Player> aln;
-	int n1, n2, n3, total_points, price;
-	bool operator< (const Alineacio& a2) {
+	int n1, n2, n3, total_points, max_player_price, budget, price;
+
+  Alignment(int n1, int n2, int n3, int totP = 0, int prj = 0, int bg = 0, int price = 0):
+    aln(vector<Player>(11, Player("", "", -1, "", -1))), n1(n1), n2(n2), n3(n3), total_points(totP), max_player_price(prj), budget(bg), price(price) {}
+
+	// OPERADORS
+	bool operator< (const Alignment& a2) {
 		return total_points < a2.total_points;
 	}
-	bool operator> (const Alineacio& a2) {
+	bool operator> (const Alignment& a2) {
 		return total_points > a2.total_points;
 	}
-	bool operator== (const Alineacio& a2) {
+	bool operator== (const Alignment& a2) {
 		return total_points == a2.total_points;
 	}
 	Player& operator[] (int idx) {
 		return aln[idx];
 	}
+  void addPlayer(const Player& J, int i) {
+    aln[i] = J;
+  }
+
 };
 
-vector<Player> database;
+vector<Player> gk; // porters (Goal-Keepers)
+vector<Player> df; // DeFenses
+vector<Player> md; // migcampistes
+vector<Player> dv; // DaVanters
 int n1, n2, n3, t, j;
+clock_t start_time;
 
-void write() {
-
+void write(string& filename, Alignment& A) {
+	ofstream out;
+	out.open(filename);
+	out.setf(ios::fixed);
+	out.precision(2);
+	clock_t t = clock() - start_time;
+	out << double(t) << endl
+			<< "POR: " << A[0].name << endl
+			<< "DEF: ";
+	for (int i = 0; i < n1; ++i) out << (i == 0 ? "" : ";") << A[i+1].name;
+	out << endl
+			<< "MIG: ";
+	for (int i = 0; i < n2; ++i) out << (i == 0 ? "" : ";") << A[i+n1].name;
+	out << endl
+			<< "DAV: ";
+	for (int i = 0; i < n3; ++i) out << (i == 0 ? "" : ";") << A[i+n2].name;
+	out << endl
+			<< "Punts: " << A.total_points << endl
+			<< "Preu: "  << A.price << endl;
+	out.close();
 }
 
 void read_consult(string& filename) {
@@ -89,8 +126,15 @@ void read_database(string& filename) {
     in >> punts;
     string aux2;
     getline(in,aux2);
-		Player jugador(nom,posicio,preu,club,punts);
-		database.push_back(jugador);
+		Player jugador(nom, posicio, preu, club, punts);
+		if (preu <= j) { // tallem la base de dades pel preu
+			switch(getpos(posicio)) {
+				case 0: gk.push_back(jugador);
+				case 1: df.push_back(jugador);
+				case 2: md.push_back(jugador);
+				case 3: dv.push_back(jugador);
+			}
+		}
   }
   in.close();
 }
@@ -98,19 +142,22 @@ void read_database(string& filename) {
 
 vector<int> vec(11);
 vector<int> alineacio = {1, n1, n2, n3};
-void rec(int pos, int dinerete) {
+void rec(int& pos, int money_left, string& output_file_name, Alignment& currentTeam) {
 	if (pos == 11) {
-
+		if (currentTeam <)
 	} else {
 
 	}
 }
 
 int main(int argc, char** argv) {
-	if (argc != 3) {
-    cout << "Syntax: " << argv[0] << " data_base.txt query_file.txt" << endl;
+	if (argc != 4) {
+    cout << "Syntax: " << argv[0] << " data_base.txt [query_file_name] [output_file_name]" << endl;
     exit(1);
   }
-	read_database(argv[1]);
 	read_consult(argv[2]);
+	read_database(argv[1]); // llegim només els jugadors amb preu <= j
+	sort(database.begin(),database.end()); // ordenem els jugadors per punts
+	start_time = clock();
+	// rec();
 }
