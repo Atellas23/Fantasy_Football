@@ -1,7 +1,7 @@
-23.6
+372.6
 POR: Adán
 DEF: Arias;San José;Balenziaga
-MIG: Lemar;Thomas;Muniain;Campaña
-DAV: Charles;Ángel;Jorge Molina
-Punts: 1452
-Preu: 72485702
+MIG: Lemar;Thomas;Campaña;Orellana
+DAV: Jorge Molina;Mata;Portu
+Punts: 1480
+Preu: 74396654
