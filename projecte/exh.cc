@@ -96,6 +96,11 @@ void read_consult(string& filename) {
 	in >> n1 >> n2 >> n3 >> t >> j;
 }
 
+bool order(const Player& a, const Player& b) {
+	if (a.points == b.points) return a.price < b.price;
+	return a.points > b.points;
+}
+
 void read_database(string& filename) {
   ifstream in(filename);
   while (not in.eof()) {
@@ -114,11 +119,9 @@ void read_database(string& filename) {
   }
   in.close();
 
-	for (int k = 0; k < 4; ++k) {
-		sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
-		reverse(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
-	}
+	for (int k = 0; k < 4; ++k) sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end(), order);
 }
+
 
 void rec(int pos, int money_left, string& output_file_name, Alignment& currentTeam, Alignment& bestTeam) {
 	if (pos == 11) {
