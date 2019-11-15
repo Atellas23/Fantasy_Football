@@ -1,7 +1,7 @@
-5843.00
+23.6
 POR: Adán
-DEF: ;Unai Simón;Unai Simón;Unai Simón
-MIG: ;Unai Simón;Unai Simón;Unai Simón;Neto
-DAV: ;Neto;Neto;Neto
-Punts: 1010
-Preu: 73812445
+DEF: Arias;San José;Balenziaga
+MIG: Lemar;Thomas;Muniain;Campaña
+DAV: Charles;Ángel;Jorge Molina
+Punts: 1452
+Preu: 72485702

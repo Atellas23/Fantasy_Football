@@ -26,19 +26,16 @@ struct Player {
     	npos(getpos(pos)), price(price), points(points) {}
 
 	// OPERADORS
-		//if (points == j2.points) return price < j2.price;
-	bool operator<  (const Player& j2) {return points <  j2.points;}
-	bool operator<= (const Player& j2) {return points <= j2.points;}
-	bool operator>  (const Player& j2) {return points >  j2.points;}
-	bool operator>= (const Player& j2) {return points >= j2.points;}
-	bool operator== (const Player& j2) {return points == j2.points;}
+	bool operator< (const Player& J) {
+		return points <= J.points and price >= J.price;
+	}
 };
 
 struct Alignment {
 	vector<Player> aln;
 	int n1, n2, n3, total_points, total_price;
 
-  	Alignment (int n1, int n2, int n3, int totP = 0, int pr = 0):
+  	Alignment (int n1, int n2, int n3, int totP = -11, int pr = -11):
     	aln(vector<Player> (11, Player("", "", -1, "", -1))),
     	n1(n1), n2(n2), n3(n3), total_points(totP), total_price(pr) {}
 
@@ -75,19 +72,19 @@ void write(string& filename, Alignment& A) {
 	ofstream out;
 	out.open(filename);
 	out.setf(ios::fixed);
-	out.precision(2);
+	out.precision(1);
 	clock_t t = clock() - start_time;
 
-	out << double(t) << endl
+	out << double(t)/CLOCKS_PER_SEC << endl
 			<< "POR: " << A[0].name << endl
 			<< "DEF: ";
-	for (int i = 1; i <= n1; ++i) out << (i == 0 ? "" : ";") << A[i].name;
+	for (int i = 0; i < n1; ++i) out << (i == 0 ? "" : ";") << A[i+1].name;
 	out << endl
 			<< "MIG: ";
-	for (int i = n1+1; i <= n1+n2; ++i) out << (i == 0 ? "" : ";") << A[i].name;
+	for (int i = 0; i < n2; ++i) out << (i == 0 ? "" : ";") << A[i+1+n1].name;
 	out << endl
 			<< "DAV: ";
-	for (int i = n1+n2+1; i <= 10; ++i) out << (i == 0 ? "" : ";") << A[i].name;
+	for (int i = 0; i < n3; ++i) out << (i == 0 ? "" : ";") << A[i+1+n1+n2].name;
 	out << endl
 			<< "Punts: " << A.total_points << endl
 			<< "Preu: "  << A.total_price << endl;
@@ -112,15 +109,8 @@ void read_database(string& filename) {
     in >> punts;
     string aux2;
     getline(in,aux2);
-		Player jugador(nom, posicio, preu, club, punts);
-		if (preu <= j) { // tallem la base de dades pel preu
-			switch(jugador.npos) {
-				case 0: PlayerDatabase[0].push_back(jugador);
-				case 1: PlayerDatabase[1].push_back(jugador);
-				case 2: PlayerDatabase[2].push_back(jugador);
-				case 3: PlayerDatabase[3].push_back(jugador);
-			}
-		}
+	Player jugador(nom, posicio, preu, club, punts);
+	if (preu <= j) {PlayerDatabase[jugador.npos].push_back(jugador);}
   }
   in.close();
 }
@@ -134,28 +124,28 @@ void rec(int pos, int money_left, string& output_file_name, Alignment& currentTe
 	} else {
 		if (pos == 0) {
 			for (Player& p: PlayerDatabase[0]) {
-				if (p.price <= money_left) {
+				if (p.price <= money_left and not (p < bestTeam[pos])) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
 			}
 		} else if (pos <= n1) {
 			for (Player& p: PlayerDatabase[1]) {
-				if (p.price <= money_left and not currentTeam.has(p)) {
+				if (p.price <= money_left and not currentTeam.has(p) and not (p < bestTeam[pos])) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
 			}
 		} else if (pos <= n1 + n2) {
 			for (Player& p: PlayerDatabase[2]) {
-				if (p.price <= money_left and not currentTeam.has(p)) {
+				if (p.price <= money_left and not currentTeam.has(p) and not (p < bestTeam[pos])) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
 			}
 		} else {
 			for (Player& p: PlayerDatabase[3]) {
-				if (p.price <= money_left and not currentTeam.has(p)) {
+				if (p.price <= money_left and not currentTeam.has(p) and not (p < bestTeam[pos])) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
@@ -174,9 +164,28 @@ int main(int argc, char** argv) {
 	
 	read_consult(query_file_name);
 	read_database(input_file_name); // llegim només els jugadors amb preu <= j
-	
 	start_time = clock();
 	Alignment team(n1, n2, n3);
 	Alignment bestTeam(n1, n2, n3);
 	rec(0, t, output_file_name, team, bestTeam);
+	
+	/*
+	for (int i = 0; i < 4; ++i) {
+		for (Player& p: PlayerDatabase[i]) {
+			if (p.npos != i) cout << "ALERTA" << endl;
+		}
+	}
+	
+	for (Player& p: PlayerDatabase[1]) {
+		
+		cout << "Nom: " << p.name << endl;
+	    cout << "Posició: " << p.pos << " " << p.npos << endl;
+	    cout << "Preu: " << p.price << endl;
+	    cout << "Club: " << p.club << endl;
+	    cout << "Punts: " << p.points << endl;
+	    cout << endl;
+	   
+	    if (p.npos != 1) cout << "ALERTA: " << p.pos << " " << p.npos << endl;
+	} 
+	*/
 }
