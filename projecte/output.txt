@@ -1,0 +1,7 @@
+5843.00
+POR: Adán
+DEF: ;Unai Simón;Unai Simón;Unai Simón
+MIG: ;Unai Simón;Unai Simón;Unai Simón;Neto
+DAV: ;Neto;Neto;Neto
+Punts: 1010
+Preu: 73812445

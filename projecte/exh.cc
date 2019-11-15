@@ -58,9 +58,9 @@ struct Alignment {
   	bool has (const Player& J) {
   		switch (J.npos) {
   			case 0: return J.id == aln[0].id;
-  			case 1: for (int i = 0; i < n1; ++i) if (J.id == aln[i].id) return true;
-		  	case 2: for (int i = 0; i < n2; ++i) if (J.id == aln[i].id) return true;
-		  	case 3: for (int i = 0; i < n3; ++i) if (J.id == aln[i].id) return true;
+  			case 1: for (int i = 1; i <= n1; ++i) if (J.id == aln[i].id) return true;
+		  	case 2: for (int i = n1+1; i <= n1+n2; ++i) if (J.id == aln[i].id) return true;
+		  	case 3: for (int i = n1+n2+1; i <= 10; ++i) if (J.id == aln[i].id) return true;
   		}
   		return false;
   	}
@@ -81,13 +81,13 @@ void write(string& filename, Alignment& A) {
 	out << double(t) << endl
 			<< "POR: " << A[0].name << endl
 			<< "DEF: ";
-	for (int i = 0; i < n1; ++i) out << (i == 0 ? "" : ";") << A[i+1].name;
+	for (int i = 1; i <= n1; ++i) out << (i == 0 ? "" : ";") << A[i].name;
 	out << endl
 			<< "MIG: ";
-	for (int i = 0; i < n2; ++i) out << (i == 0 ? "" : ";") << A[i+n1].name;
+	for (int i = n1+1; i <= n1+n2; ++i) out << (i == 0 ? "" : ";") << A[i].name;
 	out << endl
 			<< "DAV: ";
-	for (int i = 0; i < n3; ++i) out << (i == 0 ? "" : ";") << A[i+n2+n1].name;
+	for (int i = n1+n2+1; i <= 10; ++i) out << (i == 0 ? "" : ";") << A[i].name;
 	out << endl
 			<< "Punts: " << A.total_points << endl
 			<< "Preu: "  << A.total_price << endl;
@@ -132,21 +132,21 @@ void rec(int pos, int money_left, string& output_file_name, Alignment& currentTe
 			write(output_file_name, currentTeam);
 		}
 	} else {
-		if (pos == 1) {
+		if (pos == 0) {
 			for (Player& p: PlayerDatabase[0]) {
 				if (p.price <= money_left) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
 			}
-		} else if (pos < n1) {
+		} else if (pos <= n1) {
 			for (Player& p: PlayerDatabase[1]) {
 				if (p.price <= money_left and not currentTeam.has(p)) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
 			}
-		} else if (pos < n1 + n2) {
+		} else if (pos <= n1 + n2) {
 			for (Player& p: PlayerDatabase[2]) {
 				if (p.price <= money_left and not currentTeam.has(p)) {
 					currentTeam.addPlayer(p, pos);
