@@ -7,6 +7,12 @@
 
 using namespace std;
 
+int player_count = 0;
+
+int getPlayerId() {
+	return player_count++;
+}
+
 int getpos(string& pos) {
 	if (pos == "por") return 0;
 	else if (pos == "def") return 1;
@@ -16,9 +22,9 @@ int getpos(string& pos) {
 
 struct Player {
 	string name, pos, club;
-	int npos, price, points;
+	int id, npos, price, points;
 	Player(string name, string pos, int price, string club, int points):
-    name(name), pos(pos), club(club), npos(getpos(pos)), price(price), points(points) {}
+    name(name), pos(pos), club(club), id(getPlayerId()), npos(getpos(pos)), price(price), points(points) {}
 
 	// OPERADORS
 	bool operator< (const Player& j2) {
@@ -78,7 +84,10 @@ vector<Player> dv; // DaVanters
 */
 int n1, n2, n3, t, j;
 clock_t start_time;
-Alignment bestTeam;
+
+bool positionOrder(const Player& a, const Player& b) {
+	return a.npos < b.npos;
+}
 
 void write(string& filename, Alignment& A) {
 	ofstream out;
@@ -86,6 +95,7 @@ void write(string& filename, Alignment& A) {
 	out.setf(ios::fixed);
 	out.precision(2);
 	clock_t t = clock() - start_time;
+	sort(A.aln.begin(),A.aln.end(),positionOrder);
 	out << double(t) << endl
 			<< "POR: " << A[0].name << endl
 			<< "DEF: ";
@@ -138,14 +148,28 @@ void read_database(string& filename) {
 
 vector<int> vec(11);
 vector<int> alineacio = {1, n1, n2, n3};
+vector<bool> used;
 
-void rec(int& pos, int money_left, string& output_file_name, Alignment& currentTeam) {
+void rec(int pos, int money_left, string& output_file_name, Alignment& currentTeam, Alignment& bestTeam) {
 	if (pos == 11) {
 		if (currentTeam == bestTeam ? currentTeam.price < bestTeam.price : currentTeam < bestTeam) {
 			bestTeam = currentTeam;
 			write(output_file_name, currentTeam);
 		}
 	} else {
+		if (money_left < j) return;
+		for (Player& p: database) {
+			if (not used[p.id]) {
+				used[p.id] = true;
+				if (alineacio[p.npos] > 0) {
+					--alineacio[p.npos];
+					currentTeam.addPlayer(p,pos);
+					rec(pos + 1, money_left - p.price, output_file_name, currentTeam, bestTeam);
+					++alineacio[p.npos];
+				}
+				used[p.id] = false;
+			}
+		}
 	}
 }
 
@@ -157,9 +181,10 @@ int main(int argc, char** argv) {
 	string input_file_name = argv[1], query_file_name = argv[2], output_file_name = argv[3];
 	read_consult(query_file_name);
 	read_database(input_file_name); // llegim només els jugadors amb preu <= j
-	sort(database.begin(),database.end()); // ordenem els jugadors per punts
+	used = vector<bool>(player_count, false);
+	sort(database.begin(), database.end()); // ordenem els jugadors per punts
 	start_time = clock();
-	Alignment team(n1,n2,n3,0,j,t,0);
-	bestTeam = Alignment(n1,n2,n3,0,j,t,0);
-	// rec(0,t,output_file_name,team);
+	Alignment team(n1, n2, n3, 0, j, t, 0);
+	Alignment bestTeam(n1, n2, n3, 0, j, t, 0);
+	// rec(0,t,output_file_name,team,bestTeam);
 }
