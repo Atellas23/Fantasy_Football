@@ -7,10 +7,11 @@
 
 using namespace std;
 
+// Comptador global, perquè cada jugador tingui un identificador unic.
 int player_count = 0;
-
 int getPlayerId() {return player_count++;}
 
+// Donat un string amb la posicio d'un jugador, la retorna amb numero.
 int getpos(string& pos) {
 	if (pos == "por") return 0;
 	else if (pos == "def") return 1;
@@ -18,6 +19,10 @@ int getpos(string& pos) {
 	else return 3;
 }
 
+´/*    STRUCT PLAYER
+- Conte la informacio basica del jugador (nom, club, posicio, preu i punts).
+- Conte informacio afegida per realitzar tasques mes facilment (id, npos).
+*/
 struct Player {
 	string name, pos, club;
 	int id, npos, price, points;
@@ -25,12 +30,31 @@ struct Player {
     	name(name), pos(pos), club(club), id(iden),
     	npos(getpos(pos)), price(price), points(points) {}
 
-	// OPERADORS
+    /* OPERADOR <
+	- Només compara si un jugador es pitjor que un altre, definit com que te 
+	menys punts i alhora es mes car.
+
+	ATENCIO: no es simetric, ni defineix un ordre total entre els jugadors.
+	*/
 	bool operator< (const Player& J) {
 		return points <= J.points and price >= J.price;
 	}
 };
 
+
+/* STRUCT ALIGNEMENT
+- Conte informacio sobre una alineacio concreta
+sempre hi ha un porter
+n1: nombre de defenses
+n2: nombre de migcampistes
+n3: nombre de davanters
+
+CONDICIO: n1 + n2 + n3 = 10
+
+- Tambe conte la suma de punts i la suma de preus dels jugadors
+
+El constructor inicialitza amb jugadors inventats
+*/
 struct Alignment {
 	vector<Player> aln;
 	int n1, n2, n3, total_points, total_price;
@@ -68,6 +92,7 @@ vector<vector<Player>> PlayerDatabase(4);
 int n1, n2, n3, t, j;
 clock_t start_time;
 
+// Funcio que imprimeix en un fitxer una alineacio
 void write(string& filename, Alignment& A) {
 	ofstream out;
 	out.open(filename);
@@ -91,16 +116,21 @@ void write(string& filename, Alignment& A) {
 	out.close();
 }
 
-void read_consult(string& filename) {
+// Lectura dels parametres d'entrada
+void read_query(string& filename) {
 	ifstream in(filename);
 	in >> n1 >> n2 >> n3 >> t >> j;
 }
 
+// Ordre en que s'ordenen els jugadors
 bool order(const Player& a, const Player& b) {
 	if (a.points == b.points) return a.price < b.price;
 	return a.points > b.points;
 }
 
+// Funcio que llegeix d'un fitxer un llistat de jugadors
+// i els col·loca ordenats per posicio i per punts a la base 
+// de dades de jugadors que consta de 4 vectors de jugadors.
 void read_database(string& filename) {
   ifstream in(filename);
   while (not in.eof()) {
@@ -122,7 +152,9 @@ void read_database(string& filename) {
 	for (int k = 0; k < 4; ++k) sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end(), order);
 }
 
+/* CERCA EXHAUSTIVA
 
+*/
 void rec(int pos, int money_left, string& output_file_name, Alignment& currentTeam, Alignment& bestTeam) {
 	if (pos == 11) {
 		if (currentTeam == bestTeam ? currentTeam.total_price < bestTeam.total_price : currentTeam > bestTeam) {
@@ -170,30 +202,11 @@ int main(int argc, char** argv) {
 
 	string input_file_name = argv[1], query_file_name = argv[2], output_file_name = argv[3];
 
-	read_consult(query_file_name);
+	read_query(query_file_name);
 	read_database(input_file_name); // llegim només els jugadors amb preu <= j
 	start_time = clock();
 	Alignment team(n1, n2, n3);
 	Alignment bestTeam(n1, n2, n3);
 	rec(0, t, output_file_name, team, bestTeam);
 
-	/*
-	for (int i = 0; i < 4; ++i) {
-		for (Player& p: PlayerDatabase[i]) {
-			if (p.npos != i) cout << "ALERTA" << endl;
-		}
-	}
-
-	for (Player& p: PlayerDatabase[1]) {
-
-		cout << "Nom: " << p.name << endl;
-	    cout << "Posició: " << p.pos << " " << p.npos << endl;
-	    cout << "Preu: " << p.price << endl;
-	    cout << "Club: " << p.club << endl;
-	    cout << "Punts: " << p.points << endl;
-	    cout << endl;
-
-	    if (p.npos != 1) cout << "ALERTA: " << p.pos << " " << p.npos << endl;
-	}
-	*/
 }
