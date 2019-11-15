@@ -1,7 +1,7 @@
-372.6
+1.6
 POR: Adán
-DEF: Arias;San José;Balenziaga
-MIG: Lemar;Thomas;Campaña;Orellana
-DAV: Jorge Molina;Mata;Portu
-Punts: 1480
-Preu: 74396654
+DEF: Antunes;Djené;Coke;Cabaco;Sergio Ramos
+MIG: Rubén Pardo;Parejo;Campaña
+DAV: Messi;Jorge Molina
+Punts: 1944
+Preu: 238301991

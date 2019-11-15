@@ -22,7 +22,7 @@ struct Player {
 	string name, pos, club;
 	int id, npos, price, points;
 	Player(string name, string pos, int price, string club, int points, int iden = getPlayerId()):
-    	name(name), pos(pos), club(club), id(iden), 
+    	name(name), pos(pos), club(club), id(iden),
     	npos(getpos(pos)), price(price), points(points) {}
 
 	// OPERADORS
@@ -43,9 +43,9 @@ struct Alignment {
 	bool operator<  (const Alignment& a2) {return total_points <  a2.total_points;}
 	bool operator>  (const Alignment& a2) {return total_points >  a2.total_points;}
 	bool operator== (const Alignment& a2) {return total_points == a2.total_points;}
-	
+
 	Player& operator[] (int idx) {return aln[idx];}
-  	
+
   	void addPlayer (const Player& J, int i) {
   		total_points += J.points - aln[i].points;
   		total_price  += J.price  - aln[i].price;
@@ -113,6 +113,11 @@ void read_database(string& filename) {
 	if (preu <= j) {PlayerDatabase[jugador.npos].push_back(jugador);}
   }
   in.close();
+
+	for (int k = 0; k < 4; ++k) {
+		sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
+		reverse(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
+	}
 }
 
 void rec(int pos, int money_left, string& output_file_name, Alignment& currentTeam, Alignment& bestTeam) {
@@ -161,31 +166,31 @@ int main(int argc, char** argv) {
 	}
 
 	string input_file_name = argv[1], query_file_name = argv[2], output_file_name = argv[3];
-	
+
 	read_consult(query_file_name);
 	read_database(input_file_name); // llegim només els jugadors amb preu <= j
 	start_time = clock();
 	Alignment team(n1, n2, n3);
 	Alignment bestTeam(n1, n2, n3);
 	rec(0, t, output_file_name, team, bestTeam);
-	
+
 	/*
 	for (int i = 0; i < 4; ++i) {
 		for (Player& p: PlayerDatabase[i]) {
 			if (p.npos != i) cout << "ALERTA" << endl;
 		}
 	}
-	
+
 	for (Player& p: PlayerDatabase[1]) {
-		
+
 		cout << "Nom: " << p.name << endl;
 	    cout << "Posició: " << p.pos << " " << p.npos << endl;
 	    cout << "Preu: " << p.price << endl;
 	    cout << "Club: " << p.club << endl;
 	    cout << "Punts: " << p.points << endl;
 	    cout << endl;
-	   
+
 	    if (p.npos != 1) cout << "ALERTA: " << p.pos << " " << p.npos << endl;
-	} 
+	}
 	*/
 }
