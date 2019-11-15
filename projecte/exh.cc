@@ -7,8 +7,6 @@
 
 using namespace std;
 
-int pl_count = 0, al_count = 0;
-
 int getpos(string& pos) {
 	if (pos == "por") return 0;
 	else if (pos == "def") return 1;
@@ -16,23 +14,15 @@ int getpos(string& pos) {
 	else return 3;
 }
 
-int getPlayerId() {
-	return pl_count++;
-}
-
-int getAlignmentId() {
-  return al_count++;
-}
-
 struct Player {
 	string name, pos, club;
-	int id, npos, price, points;
+	int npos, price, points;
 	Player(string name, string pos, int price, string club, int points):
-    name(name), pos(pos), club(club), id(getPlayerId()), npos(getpos(pos)), price(price), points(points) {}
+    name(name), pos(pos), club(club), npos(getpos(pos)), price(price), points(points) {}
 
 	// OPERADORS
 	bool operator< (const Player& j2) {
-		if (points == j2.points) return price < j2.price;
+		//if (points == j2.points) return price < j2.price;
 		return points < j2.points;
 	}
 
@@ -79,12 +69,16 @@ struct Alignment {
 
 };
 
+vector<Player> database;
+/*
 vector<Player> gk; // porters (Goal-Keepers)
 vector<Player> df; // DeFenses
 vector<Player> md; // migcampistes
 vector<Player> dv; // DaVanters
+*/
 int n1, n2, n3, t, j;
 clock_t start_time;
+Alignment bestTeam;
 
 void write(string& filename, Alignment& A) {
 	ofstream out;
@@ -128,25 +122,30 @@ void read_database(string& filename) {
     getline(in,aux2);
 		Player jugador(nom, posicio, preu, club, punts);
 		if (preu <= j) { // tallem la base de dades pel preu
+			database.push_back(jugador);
+			/*
 			switch(getpos(posicio)) {
 				case 0: gk.push_back(jugador);
 				case 1: df.push_back(jugador);
 				case 2: md.push_back(jugador);
 				case 3: dv.push_back(jugador);
 			}
+			*/
 		}
   }
   in.close();
 }
 
-
 vector<int> vec(11);
 vector<int> alineacio = {1, n1, n2, n3};
+
 void rec(int& pos, int money_left, string& output_file_name, Alignment& currentTeam) {
 	if (pos == 11) {
-		if (currentTeam <)
+		if (currentTeam == bestTeam ? currentTeam.price < bestTeam.price : currentTeam < bestTeam) {
+			bestTeam = currentTeam;
+			write(output_file_name, currentTeam);
+		}
 	} else {
-
 	}
 }
 
@@ -155,9 +154,12 @@ int main(int argc, char** argv) {
     cout << "Syntax: " << argv[0] << " data_base.txt [query_file_name] [output_file_name]" << endl;
     exit(1);
   }
-	read_consult(argv[2]);
-	read_database(argv[1]); // llegim només els jugadors amb preu <= j
+	string input_file_name = argv[1], query_file_name = argv[2], output_file_name = argv[3];
+	read_consult(query_file_name);
+	read_database(input_file_name); // llegim només els jugadors amb preu <= j
 	sort(database.begin(),database.end()); // ordenem els jugadors per punts
 	start_time = clock();
-	// rec();
+	Alignment team(n1,n2,n3,0,j,t,0);
+	bestTeam = Alignment(n1,n2,n3,0,j,t,0);
+	// rec(0,t,output_file_name,team);
 }
