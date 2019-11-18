@@ -162,28 +162,28 @@ void rec(int pos, int money_left, string& output_file_name, Alignment& currentTe
 	} else {
 		if (pos == 0) {
 			for (Player& p: PlayerDatabase[0]) {
-				if (p.price <= money_left and not (p < bestTeam[pos])) {
+				if (p.price <= money_left) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
 			}
 		} else if (pos <= n1) {
 			for (Player& p: PlayerDatabase[1]) {
-				if (p.price <= money_left and not currentTeam.has(p) and not (p < bestTeam[pos])) {
+				if (p.price <= money_left and not currentTeam.has(p)) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
 			}
 		} else if (pos <= n1 + n2) {
 			for (Player& p: PlayerDatabase[2]) {
-				if (p.price <= money_left and not currentTeam.has(p) and not (p < bestTeam[pos])) {
+				if (p.price <= money_left and not currentTeam.has(p)) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
 			}
 		} else {
 			for (Player& p: PlayerDatabase[3]) {
-				if (p.price <= money_left and not currentTeam.has(p) and not (p < bestTeam[pos])) {
+				if (p.price <= money_left and not currentTeam.has(p)) {
 					currentTeam.addPlayer(p, pos);
 					rec(pos+1, money_left-p.price, output_file_name, currentTeam, bestTeam);
 				}
