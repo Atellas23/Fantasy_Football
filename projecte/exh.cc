@@ -19,7 +19,7 @@ int getpos(string& pos) {
 	else return 3;
 }
 
-´/*    STRUCT PLAYER
+/*    STRUCT PLAYER
 - Conte la informacio basica del jugador (nom, club, posicio, preu i punts).
 - Conte informacio afegida per realitzar tasques mes facilment (id, npos).
 */
@@ -152,9 +152,7 @@ void read_database(string& filename) {
 	for (int k = 0; k < 4; ++k) sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end(), order);
 }
 
-/* CERCA EXHAUSTIVA
 
-*/
 void rec(int pos, int money_left, string& output_file_name, Alignment& currentTeam, Alignment& bestTeam) {
 	if (pos == 11) {
 		if (currentTeam == bestTeam ? currentTeam.total_price < bestTeam.total_price : currentTeam > bestTeam) {
