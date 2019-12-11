@@ -28,4 +28,22 @@ int main() {
     }
   }
   system("pr -m -t FITXER.txt FITXER2.txt");
+  ///*
+  vector<int> points1, points2;
+  ifstream in("FITXER.txt");
+  int p;
+  while (not in.eof()) {
+    in >> p;
+    points1.push_back(p);
+  }
+  in.close();
+  in.open("FITXER2.txt");
+  while (not in.eof()) {
+    in >> p;
+    points2.push_back(p);
+  }
+  int div = 0;
+  for (int k = 0; k < (int)points1.size(); ++k) div += points1[k] > points2[k];
+  cout << "The data in \"FITXER.txt\" is " << 100*double(div)/points1.size() << "% better than the data in \"FITXER2.txt\".\n";
+  //*/
 }
