@@ -147,8 +147,6 @@ void ordre(vector<double>& pond, vector<int>& ord) {
 		ord[i] = max_idx;
 		swap(pond[0], pond[max_idx]);
 	}
-
-	return ord;
 }
 
 void Greedy(Alignment& S) {
