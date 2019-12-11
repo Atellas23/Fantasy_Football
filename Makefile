@@ -4,6 +4,8 @@ all:
 fetch:
 	@git pull
 
+m = update
+
 update:
 	@git add --all
 	@git commit -m $(m)
