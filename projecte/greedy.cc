@@ -76,16 +76,6 @@ struct Alignment {
   		total_price  += J.price;
     	aln[i].push_back(J);
   	}
-
-  	bool has (const Player& J) {
-  		switch (J.npos) {
-  			case 0: return J.id == aln[0].id;
-  			case 1: for (int i = 1; i <= n1; ++i) if (J.id == aln[i].id) return true;
-		  	case 2: for (int i = n1+1; i <= n1+n2; ++i) if (J.id == aln[i].id) return true;
-		  	case 3: for (int i = n1+n2+1; i <= 10; ++i) if (J.id == aln[i].id) return true;
-  		}
-  		return false;
-  	}
 };
 
 vector<vector<Player>> PlayerDatabase(4);
