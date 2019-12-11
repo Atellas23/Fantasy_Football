@@ -1,5 +1,5 @@
 all:
-	@echo "updating"
+	@echo "doing nothing"
 
 fetch:
 	@git pull
