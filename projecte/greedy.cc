@@ -88,7 +88,7 @@ struct Alignment {
   	}
 };
 
-vector<vector<Player>> PlayerDatabase(4);
+vector< vector<Player> > PlayerDatabase(4);
 int n1, n2, n3, t, j;
 clock_t start_time;
 
