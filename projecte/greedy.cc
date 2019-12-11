@@ -17,6 +17,7 @@ int getpos(string& pos) {
 	else if (pos == "def") return 1;
 	else if (pos == "mig") return 2;
 	else if (pos == "dav") return 3;
+	return -1;
 }
 
 /*    STRUCT PLAYER
