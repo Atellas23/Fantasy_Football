@@ -7,7 +7,7 @@
 
 using namespace std;
 
-// Comptador global, perquè cada jugador tingui un identificador unic.
+// Comptador global, perque cada jugador tingui un identificador unic.
 int player_count = 0;
 int getPlayerId() {return player_count++;}
 
@@ -61,7 +61,7 @@ struct Alignment {
 	int n1, n2, n3, total_points, total_price;
 
   	Alignment (int n1, int n2, int n3, int totP = 0, int pr = 0):
-    	aln(vector< vector<Player> >(4), n1(n1), n2(n2), n3(n3),
+    	aln(vector< vector<Player> >(4)), n1(n1), n2(n2), n3(n3),
       total_points(totP), total_price(pr) {}
 
 	// OPERADORS
@@ -88,7 +88,7 @@ struct Alignment {
   	}
 };
 
-vector< vector<Player> > PlayerDatabase(4);
+vector<vector<Player>> PlayerDatabase(4);
 int n1, n2, n3, t, j;
 clock_t start_time;
 
