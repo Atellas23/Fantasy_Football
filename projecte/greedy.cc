@@ -25,6 +25,7 @@ int getpos(string& pos) {
 - Conte la informacio basica del jugador (nom, club, posicio, preu i punts).
 - Conte informacio afegida per realitzar tasques mes facilment (id, npos).
 */
+
 struct Player {
 	string name, pos, club;
 	int id, npos, price, points;
@@ -38,13 +39,21 @@ struct Player {
 
 	ATENCIO: no es simetric, ni defineix un ordre total entre els jugadors.
 	*/
+
 	bool operator< (const Player& J) {
+    /* per l'ultim va millor */
+    //return double(points*points*points)+double(1)/(price+1) > double(J.points*J.points*J.points)+double(1.0)/(J.price+1);
+    /* millora en general */
 		return double(points*points*points)/(price + 1) > double(J.points*J.points*J.points)/(J.price + 1);
+    /* la basica, les altres van millor */
     /*if (points == J.points) return price < J.price;
   	return points > J.points;*/
 	}
 };
 
+/*double rating(const Player& J) {
+  return double(J.points*J.points*J.points)+double(1.0)/J.price;
+}*/
 
 /* STRUCT ALIGNMENT
 - Conte informacio sobre una alineacio concreta
