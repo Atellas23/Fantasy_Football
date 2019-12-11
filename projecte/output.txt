@@ -1,7 +1,0 @@
-1.1
-POR: Oblak
-DEF: Piqué;Jordi Alba;Djené;Hermoso;Gayá
-MIG: Campaña;Morales;Orellana
-DAV: Charles;Jorge Molina
-Punts: 2396
-Preu: 231756518
