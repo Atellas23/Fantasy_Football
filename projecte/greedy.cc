@@ -91,15 +91,15 @@ void write(string& filename, Alignment& A) {
 	clock_t t = clock() - start_time;
 
 	out << double(t)/CLOCKS_PER_SEC << endl
-			<< "POR: " << A[0].name << endl
+			<< "POR: " << A[0][0].name << endl
 			<< "DEF: ";
-	for (int i = 0; i < n1; ++i) out << (i == 0 ? "" : ";") << A[i+1].name;
+	for (int i = 0; i < n1; ++i) out << (i == 0 ? "" : ";") << A[1][i].name;
 	out << endl
 			<< "MIG: ";
-	for (int i = 0; i < n2; ++i) out << (i == 0 ? "" : ";") << A[i+1+n1].name;
+	for (int i = 0; i < n2; ++i) out << (i == 0 ? "" : ";") << A[2][i].name;
 	out << endl
 			<< "DAV: ";
-	for (int i = 0; i < n3; ++i) out << (i == 0 ? "" : ";") << A[i+1+n1+n2].name;
+	for (int i = 0; i < n3; ++i) out << (i == 0 ? "" : ";") << A[3][i].name;
 	out << endl
 			<< "Punts: " << A.total_points << endl
 			<< "Preu: "  << A.total_price << endl;
@@ -158,7 +158,7 @@ void Greedy(Alignment& S) {
   for (int k = 0; k < 4; ++k) {
     sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
 		for (int i = 0; i < (int)PlayerDatabase[k].size(); ++i) {
-			pond[k] += PlayerDatabase[k][i]*b;
+			pond[k] += PlayerDatabase[k][i].points*b;
 			b *= a;
 		}
 		pond[k] /= (int)PlayerDatabase[k].size();
