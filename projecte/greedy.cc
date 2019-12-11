@@ -43,13 +43,12 @@ struct Player {
 	bool operator< (const Player& J) {
     // ALEX: he escrit aquestes merdes perque ho llegeixis a veure que en penses
     /* 1. igual que 3, son les millors pels hard */
-    //return double(points*points*points)+double(1)/(price+1) > double(J.points*J.points*J.points)+double(1.0)/(J.price+1);
+    // return double(points*points*points)+double(1)/(price+1) > double(J.points*J.points*J.points)+double(1.0)/(J.price+1);
     /* 2. millora en mes del 60% pero em molesta */
 		return double(points*points*points)/(price + 1) > double(J.points*J.points*J.points)/(J.price + 1);
     /* 3. funciona igual de be que 1 */
-    /*
-    if (points == J.points) return price < J.price;
-  	return points > J.points;//*/
+    // if (points == J.points) return price < J.price;
+  	// return points > J.points;
     /* COM A CONCLUSIO: diria que si ho provem amb les bases de dades per la
                         metaheuristica sortirem de dubtes, ja que tindrem mes
                         merda per comparar.
