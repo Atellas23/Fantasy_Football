@@ -110,6 +110,12 @@ void write(string& filename, Alignment& A) {
 			<< "Punts: " << A.total_points << endl
 			<< "Preu: "  << A.total_price << endl;
 	out.close();
+
+	out.open("FITXER.txt", ofstream::app);
+	out.setf(ios::fixed);
+	out.precision(1);
+	out << A.total_points << endl;
+	out.close();
 }
 
 // Lectura dels parametres d'entrada

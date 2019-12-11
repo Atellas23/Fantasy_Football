@@ -1,7 +1,7 @@
-3.0
-POR: idBis-159
-DEF: idBis-666;idBis-1298;idBis-1370
-MIG: idBis-1599;idBis-2712;idBis-1651;idBis-2104;idBis-2230
-DAV: idBis-2835;idBis-2895
-Punts: 555094
-Preu: 1851190
+0.0
+POR: Fake_goa5
+DEF: Jonathan Silva;Fake_def5;Fake_def4;Fake_def3;Fake_def2
+MIG: Parejo;Campaña;Óscar Rodríguez
+DAV: Messi;Benzema
+Punts: 1497
+Preu: 239663329
