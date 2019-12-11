@@ -16,7 +16,7 @@ int getpos(string& pos) {
 	if (pos == "por") return 0;
 	else if (pos == "def") return 1;
 	else if (pos == "mig") return 2;
-	else return 3;
+	else if (pos == "dav") return 3;
 }
 
 /*    STRUCT PLAYER
@@ -43,7 +43,7 @@ struct Player {
 };
 
 
-/* STRUCT ALIGNEMENT
+/* STRUCT ALIGNMENT
 - Conte informacio sobre una alineacio concreta
 sempre hi ha un porter
 n1: nombre de defenses
@@ -57,24 +57,24 @@ CONDICIO: n1 + n2 + n3 = 10
 El constructor inicialitza amb jugadors inventats
 */
 struct Alignment {
-	vector<Player> aln;
+	vector< vector<Player> > aln;
 	int n1, n2, n3, total_points, total_price;
 
-  	Alignment (int n1, int n2, int n3, int totP = -11, int pr = -11):
-    	aln(vector<Player> (11, Player("", "", -1, "", -1))),
-    	n1(n1), n2(n2), n3(n3), total_points(totP), total_price(pr) {}
+  	Alignment (int n1, int n2, int n3, int totP = 0, int pr = 0):
+    	aln(vector< vector<Player> >(4), n1(n1), n2(n2), n3(n3),
+      total_points(totP), total_price(pr) {}
 
 	// OPERADORS
 	bool operator<  (const Alignment& a2) {return total_points <  a2.total_points;}
 	bool operator>  (const Alignment& a2) {return total_points >  a2.total_points;}
 	bool operator== (const Alignment& a2) {return total_points == a2.total_points;}
 
-	Player& operator[] (int idx) {return aln[idx];}
+	vector<Player>& operator[] (int idx) {return aln[idx];}
 
   	void addPlayer (const Player& J, int i) {
-  		total_points += J.points - aln[i].points;
-  		total_price  += J.price  - aln[i].price;
-    	aln[i] = J;
+  		total_points += J.points;
+  		total_price  += J.price;
+    	aln[i].push_back(J);
   	}
 
   	bool has (const Player& J) {
@@ -131,25 +131,61 @@ void read_database(string& filename) {
   while (not in.eof()) {
     string nom, posicio, club;
     int punts, preu;
-    getline(in,nom,';');    if (nom == "") break;
-    getline(in,posicio,';');
+    getline(in, nom, ';');    if (nom == "") break;
+    getline(in, posicio, ';');
     in >> preu;
     char aux; in >> aux;
-    getline(in,club,';');
+    getline(in, club, ';');
     in >> punts;
     string aux2;
-    getline(in,aux2);
-	  Player jugador(nom, posicio, preu, club, punts);
-	  if (preu <= j) PlayerDatabase[jugador.npos].push_back(jugador);
+    getline(in, aux2);
+		if (preu <= j) {
+			Player jugador(nom, posicio, preu, club, punts);
+			PlayerDatabase[jugador.npos].push_back(jugador);
+		}
   }
   in.close();
-  for (int k = 0; k < 4; ++k)
-    sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end(), order);
+}
 
+void ordre(vector<double>& pond, vector<int>& ord) {
+
+	for (int i = 0; i < (int)pond.size(); ++i) {
+		int max_idx = i;
+		for (int j = i; j < (int)pond.size(); ++j) {
+			if (pond[j] > pond[max_idx]) max_idx = j;
+		}
+		ord[i] = max_idx;
+		swap(pond[0], pond[max_idx]);
+	}
+
+	return ord;
 }
 
 void Greedy(Alignment& S) {
-  
+	vector<double> pond(4, 0);
+	double a = 0.9, b = 1;
+
+  for (int k = 0; k < 4; ++k) {
+    sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
+		for (int i = 0; i < (int)PlayerDatabase[k].size(); ++i) {
+			pond[k] += PlayerDatabase[k][i]*b;
+			b *= a;
+		}
+		pond[k] /= (int)PlayerDatabase[k].size();
+	}
+
+	vector<int> ord(pond.size());
+	ordre(pond, ord);
+
+	vector<int> n = {1, n1, n2, n3};
+  for (int database_idx: ord) {
+    for (int i = 0; i < n[database_idx]; ++i) {
+      if (PlayerDatabase[database_idx][i].price <= t) {
+				S[database_idx].push_back(PlayerDatabase[database_idx][i]);
+				t -= PlayerDatabase[database_idx][i].price;
+			}
+    }
+  }
 }
 
 // ************ FUNCIO MAIN **************
