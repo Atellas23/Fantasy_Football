@@ -162,10 +162,12 @@ int main(int argc, char** argv) {
 	read_query(query_file_name);
 	read_database(input_file_name);
 
-	start_time = clock(); // Iniciem el cronometre
+	start_time = clock(); // Iniciem el cronometre.
 
-
-  // Deduim quin el millor
-  Alignment team(n1, n2, n3);
+  // Deduim quina es la millor alineacio que podem trobar.
 	Alignment bestTeam(n1, n2, n3);
+  Greedy();
+
+  // Escribim la solucio
+  write(output_file_name, bestTeam);
 }
