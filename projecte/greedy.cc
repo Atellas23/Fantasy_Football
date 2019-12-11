@@ -123,11 +123,6 @@ void read_query(string& filename) {
 	in >> n1 >> n2 >> n3 >> t >> j;
 }
 
-// Ordre en que s'ordenen els jugadors
-bool order(const Player& a, const Player& b) {
-	if (a.points == b.points) return a.price < b.price;
-	return a.points > b.points;
-}
 
 // Funcio que llegeix d'un fitxer un llistat de jugadors
 // i els col·loca ordenats per posicio i per punts a la base
@@ -149,21 +144,28 @@ void read_database(string& filename) {
 	  if (preu <= j) {PlayerDatabase[jugador.npos].push_back(jugador);}
   }
   in.close();
+  for (int k = 0; k < 4; ++k) sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end(), order);
 
-	for (int k = 0; k < 4; ++k) sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end(), order);
 }
 
+// ************ FUNCIO MAIN **************
+
 int main(int argc, char** argv) {
+  // En cas de no proporcionar-se tots els fitxers d'entrada salta un error.
 	if (argc != 4) {
-	    cout << "Syntax: " << argv[0] << " data_base.txt [query_file_name] [output_file_name]" << endl;
+	    cout << "Syntax: " << argv[0] << " [data_base_file_name] [query_file_name] [output_file_name]" << endl;
 	    exit(1);
 	}
 
+  // Llegim les dades d'entrada a traves dels fitxers proporcionats.
 	string input_file_name = argv[1], query_file_name = argv[2], output_file_name = argv[3];
-
 	read_query(query_file_name);
-	read_database(input_file_name); // llegim només els jugadors amb preu <= j
-	start_time = clock();
-	Alignment team(n1, n2, n3);
+	read_database(input_file_name);
+
+	start_time = clock(); // Iniciem el cronometre
+
+
+  // Deduim quin el millor
+  Alignment team(n1, n2, n3);
 	Alignment bestTeam(n1, n2, n3);
 }
