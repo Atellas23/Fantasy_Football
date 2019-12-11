@@ -6,7 +6,7 @@ fetch:
 
 update:
 	@git add --all
-	@git commit -m \'$(m)\'
+	@git commit -m $(m)
 	@git push
 	@echo "done!"
 
