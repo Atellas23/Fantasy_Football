@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <ctime>
 #include <cassert>
+#include <cmath>
 
 using namespace std;
 
@@ -38,8 +39,9 @@ struct Player {
 	ATENCIO: no es simetric, ni defineix un ordre total entre els jugadors.
 	*/
 	bool operator< (const Player& J) {
-    if (points == J.points) return price < J.price;
-  	return points > J.points;
+		return double(points*points*points)/log(price + 1) > double(J.points*J.points*J.points)/log(J.price + 1);
+    /*if (points == J.points) return price < J.price;
+  	return points > J.points;*/
 	}
 };
 
@@ -85,6 +87,9 @@ clock_t start_time;
 
 // Funcio que imprimeix en un fitxer una alineacio
 void write(string& filename, Alignment& A) {
+	cout << j << " " << t << endl;
+	cout << 1 << " " << n1 << " " << n2 << " " << n3 << endl;
+	cout << A[0].size() << " " << A[1].size() << " " << A[2].size() << " " << A[3].size() << endl;
 	ofstream out;
 	out.open(filename);
 	out.setf(ios::fixed);
@@ -139,40 +144,46 @@ void read_database(string& filename) {
 }
 
 void ordre(vector<double>& pond, vector<int>& ord) {
-
+	ord = {0, 1, 2, 3};
 	for (int i = 0; i < (int)pond.size(); ++i) {
 		int max_idx = i;
 		for (int j = i; j < (int)pond.size(); ++j) {
 			if (pond[j] > pond[max_idx]) max_idx = j;
 		}
-		ord[i] = max_idx;
-		swap(pond[0], pond[max_idx]);
+		swap(ord[i], ord[max_idx]);
+		swap(pond[i], pond[max_idx]);
 	}
 }
 
 void Greedy(Alignment& S) {
 	vector<double> pond(4, 0);
-	double a = 0.9, b = 1;
 
   for (int k = 0; k < 4; ++k) {
+		double a = 0.9, b = 1;
     sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
 		for (int i = 0; i < (int)PlayerDatabase[k].size(); ++i) {
 			pond[k] += PlayerDatabase[k][i].points*b;
 			b *= a;
 		}
-		pond[k] /= (int)PlayerDatabase[k].size();
+		// pond[k] /= (int)PlayerDatabase[k].size();
 	}
 
 	vector<int> ord(pond.size());
 	ordre(pond, ord);
 
+
+	// ord = {3, 2, 1, 0};
+
 	vector<int> n = {1, n1, n2, n3};
   for (int database_idx: ord) {
-    for (int i = 0; i < n[database_idx]; ++i) {
-      if (PlayerDatabase[database_idx][i].price <= t) {
-				S[database_idx].push_back(PlayerDatabase[database_idx][i]);
-				t -= PlayerDatabase[database_idx][i].price;
-			}
+		int pos = 0;
+    for (int i = 0; i < n[database_idx] and pos < (int)PlayerDatabase[database_idx].size();) {
+      if (PlayerDatabase[database_idx][pos].price <= t) {
+        S.addPlayer(PlayerDatabase[database_idx][pos], database_idx);
+        t -= PlayerDatabase[database_idx][pos].price;
+				++i;
+      }
+			++pos;
     }
   }
 }
