@@ -6,7 +6,7 @@ fetch:
 
 update:
 	@git add --all
-	@git commit -m 'coses'
+	@git commit -m \'$(m)\'
 	@git push
 
 compile:
