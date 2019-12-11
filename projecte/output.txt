@@ -1,7 +1,7 @@
 0.0
-POR: Fake_goa5
-DEF: Jonathan Silva;Fake_def5;Fake_def4;Fake_def3;Fake_def2
-MIG: Parejo;Campaña;Óscar Rodríguez
-DAV: Messi;Benzema
-Punts: 1497
-Preu: 239663329
+POR: Neto
+DEF: Raúl García;Antunes;José A. Cote;Moyano;Aritz
+MIG: Maksimovic;Toni;Vesga
+DAV: Charles;Jorge Molina
+Punts: 1724
+Preu: 14353372

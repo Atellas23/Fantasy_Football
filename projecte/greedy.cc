@@ -39,7 +39,7 @@ struct Player {
 	ATENCIO: no es simetric, ni defineix un ordre total entre els jugadors.
 	*/
 	bool operator< (const Player& J) {
-		return double(points*points*points)/log(price + 1) > double(J.points*J.points*J.points)/log(J.price + 1);
+		return double(points*points*points)/(price + 1) > double(J.points*J.points*J.points)/(J.price + 1);
     /*if (points == J.points) return price < J.price;
   	return points > J.points;*/
 	}

@@ -27,4 +27,25 @@ int main() {
       system(new_new_command.c_str());
     }
   }
+  system("pr -m -t FITXER.txt FITXER2.txt");
+  /*
+  vector<int> points1, points2;
+  ifstream in("FITXER.txt");
+  int p, tot1 = 0, tot2 = 0;
+  while (not in.eof()) {
+    in >> p;
+    points1.push_back(p);
+    tot1 += p;
+  }
+  in.close();
+  in.open("FITXER2.txt");
+  while (not in.eof()) {
+    in >> p;
+    points2.push_back(p);
+    tot2 += p;
+  }
+  double div = 0;
+  for (int k = 0; k < (int)points1.size(); ++k) div += (double(points1[k])/tot1)*log((double(points1[k])/tot1)/(double(points2[k])/tot2));
+  cout << "The Kullback-Leibler Divergence D(\"FITXER.TXT\"||\"FITXER2.TXT\") = " << div << ".\n";
+  */
 }
