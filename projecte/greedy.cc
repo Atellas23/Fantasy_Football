@@ -180,7 +180,7 @@ void Greedy(Alignment& S) {
 	vector<double> pond(4, 0);
 
   for (int k = 0; k < 4; ++k) {
-		double a = 0.9, b = 1;
+		double a = 0.2, b = 1;
     sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
 		for (int i = 0; i < (int)PlayerDatabase[k].size(); ++i) {
 			pond[k] += PlayerDatabase[k][i].points*b;
