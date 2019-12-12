@@ -58,7 +58,11 @@ struct Player {
     */
 		/* 4. ho provem amb el preu per jugador */
 		// cout << (double(points*points*points)) << " " << (double(1)/(j - price)) << endl;
-		return (double(points) - 1e8*double(1)/(j - price)) > (double(J.points) - 1e8*double(1)/(j - J.price));
+		// ALEIX: he posat uns coeficients que equilibren, milloren bastant els easy pero empitjoren poquet els medium
+ 		// Aquestes comparacions son inutils pero jo optaria per posar-les en el que entreguem
+		// if (j == price) return true;
+		// if (j == J.price) return false;
+		return (1.5*double(points) - 0.8*1e8*double(1)/(j - price)) > (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
 	}
 };
 
@@ -180,7 +184,7 @@ void Greedy(Alignment& S) {
 	vector<double> pond(4, 0);
 
   for (int k = 0; k < 4; ++k) {
-		double a = 0.2, b = 1;
+		double a = 0.15, b = 1;
     sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
 		for (int i = 0; i < (int)PlayerDatabase[k].size(); ++i) {
 			pond[k] += PlayerDatabase[k][i].points*b;
@@ -192,8 +196,9 @@ void Greedy(Alignment& S) {
 	vector<int> ord(pond.size());
 	ordre(pond, ord);
 
-
-	// ord = {3, 2, 1, 0};
+	// cout << "Ordenacio: " << ord[0] << " " << ord[1] << " " << ord[2] << " " << ord[3] << endl;
+	// cout << "Ponderacio: " << pond[0] << " " << pond[1] << " " << pond[2] << " " << pond[3] << endl;
+	// ord = {1, 0, 2, 3};
 
 	vector<int> n = {1, n1, n2, n3};
   for (int database_idx: ord) {

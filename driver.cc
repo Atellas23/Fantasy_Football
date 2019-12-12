@@ -46,5 +46,16 @@ int main() {
   for (int k = 0; k < (int)points1.size(); ++k) div += points1[k] - points2[k];
   system("pr -m -t FITXER.txt FITXER2.txt");
   cout << "The data in \"FITXER.txt\" is " << div /*100*div/points1.size()*/ << " points better (in total) than the data in \"FITXER2.txt\".\n";
+
+  int easy_div = 0, med_div = 0, hard_div = 0;
+  for (int i = 0; i < 7; ++i) {
+    easy_div += points1[i] - points2[i];
+    med_div += points1[i + 7] - points2[i + 7];
+    hard_div += points1[i + 14] - points2[i + 14];
+  }
+  cout << "And it is " << easy_div << " points better only considering the easy quaries." << endl;
+  cout << "And it is " << med_div  << " points better only considering the medium quaries." << endl;
+  cout << "And it is " << hard_div << " points better only considering the hard quaries." << endl;
+
   //*/
 }
