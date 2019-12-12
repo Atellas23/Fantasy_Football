@@ -1,10 +1,11 @@
+m = update
+name = main
+
 all:
 	@echo "doing nothing"
 
 fetch:
 	@git pull
-
-m = update
 
 update:
 	@git add --all

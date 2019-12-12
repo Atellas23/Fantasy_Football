@@ -42,8 +42,8 @@ int main() {
     in >> p;
     points2.push_back(p);
   }
-  int div = 0;
+  double div = 0;
   for (int k = 0; k < (int)points1.size(); ++k) div += points1[k] > points2[k];
-  cout << "The data in \"FITXER.txt\" is " << 100*double(div)/points1.size() << "% better than the data in \"FITXER2.txt\".\n";
+  cout << "The data in \"FITXER.txt\" is " << 100*div/points1.size() << "% better than the data in \"FITXER2.txt\".\n";
   //*/
 }
