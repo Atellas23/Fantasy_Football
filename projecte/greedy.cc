@@ -8,6 +8,9 @@
 
 using namespace std;
 
+int n1, n2, n3, t, j;
+clock_t start_time;
+
 // Comptador global, perque cada jugador tingui un identificador unic.
 int player_count = 0;
 int getPlayerId() {return player_count++;}
@@ -45,20 +48,21 @@ struct Player {
     /* 1. igual que 3, son les millors pels hard */
     // return double(points*points*points)+double(1)/(price+1) > double(J.points*J.points*J.points)+double(1.0)/(J.price+1);
     /* 2. millora en mes del 60% pero em molesta */
-		return double(points*points*points)/(price + 2) > double(J.points*J.points*J.points)/(J.price + 2);
+		// return double(points*points*points)/(pow(log(price + 2),1.25)) > double(J.points*J.points*J.points)/pow(log(J.price + 2),1.25);
     /* 3. funciona igual de be que 1 */
-		// if (points == J.points) return price < J.price;
+		// if (points == J.points and points == 0) return price < J.price;
   	// return points > J.points;
     /* COM A CONCLUSIO: diria que si ho provem amb les bases de dades per la
                         metaheuristica sortirem de dubtes, ja que tindrem mes
                         merda per comparar.
     */
+		/* 4. ho provem amb el preu per jugador */
+		// cout << (double(points*points*points)) << " " << (double(1)/(j - price)) << endl;
+		return (double(points) - 1e8*double(1)/(j - price)) > (double(J.points) - 1e8*double(1)/(j - J.price));
 	}
 };
 
-/*double rating(const Player& J) {
-  return double(J.points*J.points*J.points)+double(1.0)/J.price;
-}*/
+vector<vector<Player>> PlayerDatabase(4);
 
 /* STRUCT ALIGNMENT
 - Conte informacio sobre una alineacio concreta
@@ -95,9 +99,6 @@ struct Alignment {
   	}
 };
 
-vector<vector<Player>> PlayerDatabase(4);
-int n1, n2, n3, t, j;
-clock_t start_time;
 
 // Funcio que imprimeix en un fitxer una alineacio
 void write(string& filename, Alignment& A) {
