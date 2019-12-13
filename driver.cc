@@ -27,7 +27,7 @@ int main() {
       system(new_new_command.c_str());
     }
   }
-  ///*
+  /*
   vector<int> points1, points2;
   ifstream in1("FITXER.txt"), in2("FITXER2.txt");
   int p;
@@ -44,7 +44,7 @@ int main() {
   system("grep COMP projecte/greedy.cc");
   cout << endl;
   system("pr -m -t FITXER.txt FITXER2.txt");
-  cout << "\nThe data in \"FITXER.txt\" is " << div /*100*div/points1.size()*/ << " points better (in total) than the data in \"FITXER2.txt\".\n";
+  cout << "\nThe data in \"FITXER.txt\" is " << div << " points better (in total) than the data in \"FITXER2.txt\".\n";
 
   int easy_div = 0, med_div = 0, hard_div = 0;
   for (int i = 0; i < 7; ++i) {
@@ -56,5 +56,5 @@ int main() {
   cout << "And it is " << med_div  << " points better considering only the medium queries." << endl;
   cout << "And it is " << hard_div << " points better considering only the hard queries." << endl;
 
-  //*/
+  */
 }

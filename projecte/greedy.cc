@@ -3,7 +3,6 @@
 #include <fstream>
 #include <algorithm>
 #include <ctime>
-#include <cassert>
 #include <cmath>
 
 using namespace std;
@@ -17,31 +16,32 @@ clock_t start_time;
 int num_tot = 0;
 double mu_tot = 0;
 
-// Comptador global, perque cada jugador tingui un identificador unic.
-int player_count = 0;
-int getPlayerId() {return player_count++;}
-
-
-// Donat un string amb la posicio d'un jugador, la retorna amb numero.
+/* FUNCIO getpos
+  - Donat un string amb la posicio d'un jugador, la retorna amb numero.
+*/
 int getpos(string& pos) {
 	if (pos == "por") return 0;
 	else if (pos == "def") return 1;
 	else if (pos == "mig") return 2;
 	else if (pos == "dav") return 3;
+	// No hauria de passar, tot i així el posem.
 	return -1;
 }
 
 
 /*    STRUCT PLAYER
 - Conte la informacio basica del jugador (nom, club, posicio, preu i punts).
-- Conte informacio afegida per realitzar tasques mes facilment (id, npos).
+- Conte informacio afegida per realitzar tasques mes facilment (npos).
 */
 struct Player {
+	// PARAMETRES
 	string name, pos, club;
-	int id, npos, price, points;
-	Player(string name, string pos, int price, string club, int points, int iden = getPlayerId()):
-    	name(name), pos(pos), club(club), id(iden),
-    	npos(getpos(pos)), price(price), points(points) {}
+	int npos, price, points;
+
+	// CONSTRUCTOR
+	Player(string name, string pos, int price, string club, int points):
+    	name(name), pos(pos), club(club),	npos(getpos(pos)),
+			price(price), points(points) {}
 
   /* OPERADOR <
 	- Defineix un ordre entre els jugadors, tenint en compte els seus punts
@@ -54,6 +54,9 @@ struct Player {
 	per la base de dades inicial donada.
 	*/
 	bool operator< (const Player& J) {
+		// En el cas que la mitjana de preus dels jugadors disponibles sigui
+		// molt petita es millor ordenar segons aquest criteri. Altrament,
+		// es millor ordenar segons el que ve a continuacio.
 		if (mu_tot < 1e6) {
 			if (points == J.points) return price < J.price;
 			if (price == 0) return false;
@@ -66,7 +69,12 @@ struct Player {
 	}
 };
 
+/* BASE DE DADES dels jugadors
+	- Podria ser una struct per si mateixa pero només consisteix en 4
+	  vectors de jugadors.
 
+		Cada vector conte unicament els jugadors disponibles d'aquella posicio.
+*/
 vector<vector<Player>> PlayerDatabase(4);
 
 /* STRUCT ALIGNMENT
@@ -83,20 +91,22 @@ CONDICIO: n1 + n2 + n3 = 10
 El constructor inicialitza amb jugadors inventats
 */
 struct Alignment {
+	// PARAMETRES
 	vector< vector<Player> > aln;
 	int n1, n2, n3, total_points, total_price;
 
+	// CONSTRUCTOR
 	Alignment (int n1, int n2, int n3, int totP = 0, int pr = 0):
   	aln(vector< vector<Player> >(4)), n1(n1), n2(n2), n3(n3),
     total_points(totP), total_price(pr) {}
 
-	// OPERADORS
-	bool operator<  (const Alignment& a2) {return total_points <  a2.total_points;}
-	bool operator>  (const Alignment& a2) {return total_points >  a2.total_points;}
-	bool operator== (const Alignment& a2) {return total_points == a2.total_points;}
-
+	// OPERADOR
 	vector<Player>& operator[] (int idx) {return aln[idx];}
 
+	/* METODE addPlayer
+		- Requereix un jugador i la posicio en la que el vols possar.
+		- Actualitza els punts i el preu de l'equip.
+	*/
 	void addPlayer (const Player& J, int i) {
 		total_points += J.points;
 		total_price  += J.price;
@@ -104,9 +114,11 @@ struct Alignment {
 	}
 };
 
-
-// Funcio que imprimeix en un fitxer una alineacio, en el format demanat a
-// l'enunciat del projecte.
+/* FUNCIO write
+ - Requereix del nom del fitxer de sortida i l'alineacio a guardar.
+ - Funcio que imprimeix en un fitxer una alineacio, en el format demanat a
+	 l'enunciat del projecte.
+ */
 void write(string& filename, Alignment& A) {
 	ofstream out;
 	out.open(filename);
@@ -128,25 +140,22 @@ void write(string& filename, Alignment& A) {
 			<< "Punts: " << A.total_points << endl
 			<< "Preu: "  << A.total_price << endl;
 	out.close();
-
-	out.open("FITXER.txt", ofstream::app);
-	out.setf(ios::fixed);
-	out.precision(1);
-	out << A.total_points << endl;
-	out.close();
 }
 
-
-// Lectura dels parametres d'entrada
+/* FUNCIO read_query
+	- Requereix del fitxer de les dades d'entrada.
+  - Llegeix i guarda en memoria els parametres d'entrada.
+*/
 void read_query(string& filename) {
 	ifstream in(filename);
 	in >> n1 >> n2 >> n3 >> t >> j;
 }
 
-
-// Funcio que llegeix d'un fitxer un llistat de jugadors
-// i els col·loca ordenats per posicio i per punts a la base
-// de dades de jugadors que consta de 4 vectors de jugadors.
+/* FUNCIO read_database
+ 	- Requereix del fitxer de la base de dades dels jugadors.
+  - Llegeix del fitxer un llistat de jugadors i els col·loca
+ 	  a la base de dades de jugadors que consta de 4 vectors de jugadors.
+*/
 void read_database(string& filename) {
   ifstream in(filename);
   while (not in.eof()) {
@@ -168,9 +177,12 @@ void read_database(string& filename) {
   in.close();
 }
 
-
-// Aquesta funcio deixa a ord la permutacio de {0,1,2,3} que respecta l'ordre
-// del vector pond.
+/* FUNCIO ordre
+	- Requereix d'un vector de reals i d'un vector d'enters.
+	  Els dos de 4 components
+  - Deixa a ord la permutacio de {0,1,2,3} que respecta l'ordre
+    del vector pond.
+*/
 void ordre(vector<double>& pond, vector<int>& ord) {
 	ord = {0, 1, 2, 3};
 	for (int i = 0; i < 4; ++i) {
@@ -183,9 +195,14 @@ void ordre(vector<double>& pond, vector<int>& ord) {
 	}
 }
 
-
+/* FUNCIO Greedy
+	- Requereix una alineacio S a omplir
+	- Implementa l'algorisme golafre per obtenir una solucio que heuristicament
+		s'acosta a l'optima
+*/
 void Greedy(Alignment& S) {
 
+	// Calcul de la mitjana dels preus del jugadors disponibles
 	for (int x = 0; x < 4; ++x) {
 		for (Player jugador: PlayerDatabase[x]) {
 			mu_tot += jugador.price;
@@ -194,11 +211,12 @@ void Greedy(Alignment& S) {
 	}
 	mu_tot /= num_tot;
 
-	// El vector pond calcula una mitjana ponderada de les bases de dades per
+	// El vector pond calcula una mitjana ponderada de cada base de dades per
 	// decidir per quina posicio començarem a omplir l'alineacio
 	vector<double> pond(4, 0);
   for (int k = 0; k < 4; ++k) {
 		double a = 0.2, b = 1;
+		// Ordenacio dels vectors dels jugadors sengons la comparacio definida.
     sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
 		for (int i = 0; i < (int)PlayerDatabase[k].size(); ++i) {
 			pond[k] += PlayerDatabase[k][i].points*b;
@@ -206,13 +224,20 @@ void Greedy(Alignment& S) {
 		}
 	}
 
+	// Escull el millor ordre de les posicions per agafar jugadors.
 	vector<int> ord(pond.size());
 	ordre(pond, ord);
 
+	// Iterativament, agafa els primers jugadors que troba segons
+	// segons l'ordre establert en l'operador< de struct jugadors.
+	// Primer agafa tots els jugadors d'una posicio, despres d'una
+	// altra fins que s'acaben. L'ordre de les posicions vé definit
+	// per pond i per ord.
 	vector<int> n = {1, n1, n2, n3};
   for (int database_idx: ord) {
 		int pos = 0;
-    for (int i = 0; i < n[database_idx] and pos < (int)PlayerDatabase[database_idx].size();) {
+    for (int i = 0; i < n[database_idx] and pos <
+				(int)PlayerDatabase[database_idx].size();) {
       if (PlayerDatabase[database_idx][pos].price <= t) {
         S.addPlayer(PlayerDatabase[database_idx][pos], database_idx);
         t -= PlayerDatabase[database_idx][pos].price;
