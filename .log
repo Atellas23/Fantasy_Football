@@ -1,0 +1,29 @@
+g++ -Wall -D_GLIBCXX_DEBUG projecte/greedy.cc -o projecte/greedy.out
+COMP return (1.5*double(points) - 0.8*1e8*double(1)/(j - price)) > (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
+Testing on comparator:
+
+1125				    1125
+1158				    1158
+1174				    1174
+1150				    1150
+1166				    1166
+1105				    1105
+1138				    1138
+1917				    1917
+2108				    2108
+2153				    2153
+2112				    2112
+2137				    2137
+2055				    2055
+2119				    2119
+2171				    2171
+2337				    2337
+2403				    2403
+2190				    2190
+2245				    2245
+2401				    2401
+2424				    2424
+The data in "FITXER.txt" is 0 points better (in total) than the data in "FITXER2.txt".
+And it is 0 points better considering only the easy queries.
+And it is 0 points better considering only the medium queries.
+And it is 0 points better considering only the hard queries.
