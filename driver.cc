@@ -29,26 +29,22 @@ int main() {
   }
   ///*
   vector<int> points1, points2;
-  ifstream in("FITXER.txt");
+  ifstream in1("FITXER.txt"), in2("FITXER2.txt");
   int p;
-  while (not in.eof()) {
-    in >> p;
+  while (not in1.eof()) {
+    in1 >> p;
     points1.push_back(p);
-  }
-  in.close();
-  in.open("FITXER2.txt");
-  while (not in.eof()) {
-    in >> p;
+    in2 >> p;
     points2.push_back(p);
   }
-  in.close();
+  in1.close(); in2.close();
   int div = 0;
   for (int k = 0; k < (int)points1.size(); ++k) div += points1[k] - points2[k];
   cout << "Testing on comparator:\n";
   system("grep COMP projecte/greedy.cc");
   cout << endl;
   system("pr -m -t FITXER.txt FITXER2.txt");
-  cout << "The data in \"FITXER.txt\" is " << div /*100*div/points1.size()*/ << " points better (in total) than the data in \"FITXER2.txt\".\n";
+  cout << "\nThe data in \"FITXER.txt\" is " << div /*100*div/points1.size()*/ << " points better (in total) than the data in \"FITXER2.txt\".\n";
 
   int easy_div = 0, med_div = 0, hard_div = 0;
   for (int i = 0; i < 7; ++i) {

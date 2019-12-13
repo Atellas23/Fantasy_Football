@@ -23,6 +23,7 @@ Testing on comparator:
 2245				    2245
 2401				    2401
 2424				    2424
+
 The data in "FITXER.txt" is 0 points better (in total) than the data in "FITXER2.txt".
 And it is 0 points better considering only the easy queries.
 And it is 0 points better considering only the medium queries.
