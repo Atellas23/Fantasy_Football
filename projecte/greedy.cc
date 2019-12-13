@@ -6,17 +6,10 @@
 #include <cassert>
 #include <cmath>
 
-/*
-COMP return (1.5*double(points) - 0.8*1e8*double(1)/(j - price)) > (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
-*/
-
 using namespace std;
 
 int n1, n2, n3, t, j;
 clock_t start_time;
-
-int num_por = 0, num_def = 0, num_mig = 0, num_dav = 0;
-double mu_por = 0, mu_def = 0, mu_mig = 0, mu_dav = 0;
 
 int num_tot = 0;
 double mu_tot = 0;
@@ -38,7 +31,6 @@ int getpos(string& pos) {
 - Conte la informacio basica del jugador (nom, club, posicio, preu i punts).
 - Conte informacio afegida per realitzar tasques mes facilment (id, npos).
 */
-
 struct Player {
 	string name, pos, club;
 	int id, npos, price, points;
@@ -46,44 +38,30 @@ struct Player {
     	name(name), pos(pos), club(club), id(iden),
     	npos(getpos(pos)), price(price), points(points) {}
 
-    /* OPERADOR <
-	- Només compara si un jugador es pitjor que un altre, definit com que te
-	menys punts i alhora es mes car.
-
-	ATENCIO: no es simetric, ni defineix un ordre total entre els jugadors.
+  /* OPERADOR <
+	- Defineix un ordre entre els jugadors, tenint en compte els seus punts
+	  i el preu que tenen. A més, fa servir el parametre j, que representa
+		el cost màxim que pot tenir un jugador, com també utilitza la mitjana
+		total dels punts del jugadors, per tenir un varem de quina comparacio
+		es mes convenient utilitzar.
+	ATENCIO
+	Els coeficients utilitzats en aquesta ordenacio dels jugadors estan ajustats
+	per la base de dades inicial donada.
 	*/
-
 	bool operator< (const Player& J) {
-    // ALEX: he escrit aquestes merdes perque ho llegeixis a veure que en penses
-    /* 1. igual que 3, son les millors pels hard */
-    // return double(points*points*points)+double(1)/(price+1) > double(J.points*J.points*J.points)+double(1.0)/(J.price+1);
-    /* 2. millora en mes del 60% pero em molesta */
-		// return double(points*points*points)/(pow(log(price + 2),1.25)) > double(J.points*J.points*J.points)/pow(log(J.price + 2),1.25);
-    /* 3. funciona igual de be que 1 */
-		// if (points == J.points) return price < J.price;
-  	// return points > J.points;
-    /* COM A CONCLUSIO: diria que si ho provem amb les bases de dades per la
-                        metaheuristica sortirem de dubtes, ja que tindrem mes
-                        merda per comparar.
-    */
-		/* 4. ho provem amb el preu per jugador */
-		// cout << (double(points*points*points)) << " " << (double(1)/(j - price)) << endl;
-		// ALEIX: he posat uns coeficients que equilibren, milloren bastant els easy pero empitjoren poquet els medium
- 		// Aquestes comparacions son inutils pero jo optaria per posar-les en el que entreguem
-		// if (j == price) return true;
-		// if (j == J.price) return false;
 		if (mu_tot < 1e6) {
 			if (points == J.points) return price < J.price;
 			if (price == 0) return false;
 			if (J.price == 0) return true;
-	  	return double(points*points)/pow(log(price),16) > double(J.points*J.points)/pow(log(J.price),16);
+	  	return double(points*points)    /pow(log(price), 16) >
+						 double(J.points*J.points)/pow(log(J.price), 16);
 		}
-		return (1.5*double(points) - 0.8*1e8*double(1)/(j - price)) > (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
+		return (1.5*double(points)   - 0.8*1e8*double(1)/(j - price)) >
+					 (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
 	}
 };
 
 vector<vector<Player>> PlayerDatabase(4);
-vector<Player> PLAYER_DATABASE;
 
 /* STRUCT ALIGNMENT
 - Conte informacio sobre una alineacio concreta
@@ -102,9 +80,9 @@ struct Alignment {
 	vector< vector<Player> > aln;
 	int n1, n2, n3, total_points, total_price;
 
-  	Alignment (int n1, int n2, int n3, int totP = 0, int pr = 0):
-    	aln(vector< vector<Player> >(4)), n1(n1), n2(n2), n3(n3),
-      total_points(totP), total_price(pr) {}
+	Alignment (int n1, int n2, int n3, int totP = 0, int pr = 0):
+  	aln(vector< vector<Player> >(4)), n1(n1), n2(n2), n3(n3),
+    total_points(totP), total_price(pr) {}
 
 	// OPERADORS
 	bool operator<  (const Alignment& a2) {return total_points <  a2.total_points;}
@@ -113,19 +91,16 @@ struct Alignment {
 
 	vector<Player>& operator[] (int idx) {return aln[idx];}
 
-  	void addPlayer (const Player& J, int i) {
-  		total_points += J.points;
-  		total_price  += J.price;
-    	aln[i].push_back(J);
-  	}
+	void addPlayer (const Player& J, int i) {
+		total_points += J.points;
+		total_price  += J.price;
+  	aln[i].push_back(J);
+	}
 };
 
 
 // Funcio que imprimeix en un fitxer una alineacio
 void write(string& filename, Alignment& A) {
-	/*cout << j << " " << t << endl;
-	cout << 1 << " " << n1 << " " << n2 << " " << n3 << endl;
-	cout << A[0].size() << " " << A[1].size() << " " << A[2].size() << " " << A[3].size() << endl;*/
 	ofstream out;
 	out.open(filename);
 	out.setf(ios::fixed);
@@ -180,30 +155,13 @@ void read_database(string& filename) {
 		if (preu <= j) {
 			Player jugador(nom, posicio, preu, club, punts);
 			PlayerDatabase[jugador.npos].push_back(jugador);
-			PLAYER_DATABASE.push_back(jugador);
-
-			switch (jugador.npos) {
-				case 0: {++num_por; mu_por += jugador.price;};
-				case 1: {++num_def; mu_def += jugador.price;};
-				case 2: {++num_mig; mu_mig += jugador.price;};
-				case 3: {++num_dav; mu_dav += jugador.price;};
-			}
 		}
   }
-
-	num_tot = num_por + num_def + num_mig + num_dav;
-	mu_tot = (mu_por + mu_def + mu_mig + mu_dav)/num_tot;
-
-	mu_por /= num_por;
-	mu_def /= num_def;
-	mu_mig /= num_mig;
-	mu_dav /= num_dav;
-
-
-
   in.close();
 }
 
+// Aquesta funcio deixa a ord la permutacio de {0,1,2,3} que respecta l'ordre
+// del vector pond.
 void ordre(vector<double>& pond, vector<int>& ord) {
 	ord = {0, 1, 2, 3};
 	for (int i = 0; i < (int)pond.size(); ++i) {
@@ -216,9 +174,20 @@ void ordre(vector<double>& pond, vector<int>& ord) {
 	}
 }
 
-void Greedy(Alignment& S) {
-	vector<double> pond(4, 0);
 
+void Greedy(Alignment& S) {
+
+	for (int x = 0; x < 4; ++x) {
+		for (Player jugador: PlayerDatabase[x]) {
+			mu_tot += jugador.price;
+		}
+		num_tot += PlayerDatabase[x].size();
+	}
+	mu_tot /= num_tot;
+
+	// El vector pond calcula una mitjana ponderada de les bases de dades per
+	// decidir per quina posicio començarem a omplir l'alineacio
+	vector<double> pond(4, 0);
   for (int k = 0; k < 4; ++k) {
 		double a = 0.2, b = 1;
     sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
@@ -226,15 +195,11 @@ void Greedy(Alignment& S) {
 			pond[k] += PlayerDatabase[k][i].points*b;
 			b *= a;
 		}
-		// pond[k] /= (int)PlayerDatabase[k].size();
 	}
 
 	vector<int> ord(pond.size());
 	ordre(pond, ord);
 
-	// cout << "Ordenacio: " << ord[0] << " " << ord[1] << " " << ord[2] << " " << ord[3] << endl;
-	// cout << "Ponderacio: " << pond[0] << " " << pond[1] << " " << pond[2] << " " << pond[3] << endl;
-	// ord = {1, 0, 2, 3};
 
 	vector<int> n = {1, n1, n2, n3};
   for (int database_idx: ord) {
@@ -249,26 +214,6 @@ void Greedy(Alignment& S) {
     }
   }
 }
-
-void GREEDY2(Alignment& S) {
-	sort(PLAYER_DATABASE.begin(), PLAYER_DATABASE.end());
-
-	vector<int> v = {1, n1, n2, n3};
-	int i = 11;
-	for (Player P: PLAYER_DATABASE) {
-		if (P.price <= t and v[P.npos] > 0) {
-			S.addPlayer(P, P.npos);
-			--v[P.npos];
-			--i;
-			t -= P.price;
-		}
-		if (i == 0) break;
-	}
-
-
-
-}
-
 
 // ************ FUNCIO MAIN **************
 
@@ -291,10 +236,6 @@ int main(int argc, char** argv) {
   // Deduim quina es la millor alineacio que podem trobar.
 	Alignment bestTeam(n1, n2, n3);
   Greedy(bestTeam);
-	 //GREEDY2(bestTeam);
-  // Escribim la solucio en el fitxer de sortida.
+  // Escrivim la solucio en el fitxer de sortida.
   write(output_file_name, bestTeam);
-
-	cout << num_por << " " << num_def << " " << num_mig << " " << num_dav << " " << num_tot << endl;
-	cout << mu_por  << " " << mu_def  << " " << mu_mig  << " " << mu_dav  << " " << mu_tot  << endl;
 }
