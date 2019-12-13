@@ -71,6 +71,7 @@ struct Player {
 };
 
 vector<vector<Player>> PlayerDatabase(4);
+vector<Player> PLAYER_DATABASE;
 
 /* STRUCT ALIGNMENT
 - Conte informacio sobre una alineacio concreta
@@ -167,6 +168,7 @@ void read_database(string& filename) {
 		if (preu <= j) {
 			Player jugador(nom, posicio, preu, club, punts);
 			PlayerDatabase[jugador.npos].push_back(jugador);
+			PLAYER_DATABASE.push_back(jugador);
 		}
   }
   in.close();
@@ -218,6 +220,26 @@ void Greedy(Alignment& S) {
   }
 }
 
+void GREEDY2(Alignment& S) {
+	sort(PLAYER_DATABASE.begin(), PLAYER_DATABASE.end());
+
+	vector<int> v = {1, n1, n2, n3};
+	int i = 11;
+	for (Player P: PLAYER_DATABASE) {
+		if (P.price <= t and v[P.npos] > 0) {
+			S.addPlayer(P, P.npos);
+			--v[P.npos];
+			--i;
+			t -= P.price;
+		}
+		if (i == 0) break;
+	}
+
+
+
+}
+
+
 // ************ FUNCIO MAIN **************
 
 int main(int argc, char** argv) {
@@ -239,7 +261,7 @@ int main(int argc, char** argv) {
   // Deduim quina es la millor alineacio que podem trobar.
 	Alignment bestTeam(n1, n2, n3);
   Greedy(bestTeam);
-
+	 //GREEDY2(bestTeam);
   // Escribim la solucio en el fitxer de sortida.
   write(output_file_name, bestTeam);
 }
