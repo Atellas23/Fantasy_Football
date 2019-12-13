@@ -15,6 +15,12 @@ using namespace std;
 int n1, n2, n3, t, j;
 clock_t start_time;
 
+int num_por = 0, num_def = 0, num_mig = 0, num_dav = 0;
+double mu_por = 0, mu_def = 0, mu_mig = 0, mu_dav = 0;
+
+int num_tot = 0;
+double mu_tot = 0;
+
 // Comptador global, perque cada jugador tingui un identificador unic.
 int player_count = 0;
 int getPlayerId() {return player_count++;}
@@ -66,6 +72,12 @@ struct Player {
  		// Aquestes comparacions son inutils pero jo optaria per posar-les en el que entreguem
 		// if (j == price) return true;
 		// if (j == J.price) return false;
+		if (mu_tot < 1e6) {
+			if (points == J.points) return price < J.price;
+			if (price == 0) return false;
+			if (J.price == 0) return true;
+	  	return double(points*points)/pow(log(price),16) > double(J.points*J.points)/pow(log(J.price),16);
+		}
 		return (1.5*double(points) - 0.8*1e8*double(1)/(j - price)) > (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
 	}
 };
@@ -169,8 +181,26 @@ void read_database(string& filename) {
 			Player jugador(nom, posicio, preu, club, punts);
 			PlayerDatabase[jugador.npos].push_back(jugador);
 			PLAYER_DATABASE.push_back(jugador);
+
+			switch (jugador.npos) {
+				case 0: {++num_por; mu_por += jugador.price;};
+				case 1: {++num_def; mu_def += jugador.price;};
+				case 2: {++num_mig; mu_mig += jugador.price;};
+				case 3: {++num_dav; mu_dav += jugador.price;};
+			}
 		}
   }
+
+	num_tot = num_por + num_def + num_mig + num_dav;
+	mu_tot = (mu_por + mu_def + mu_mig + mu_dav)/num_tot;
+
+	mu_por /= num_por;
+	mu_def /= num_def;
+	mu_mig /= num_mig;
+	mu_dav /= num_dav;
+
+
+
   in.close();
 }
 
@@ -264,4 +294,7 @@ int main(int argc, char** argv) {
 	 //GREEDY2(bestTeam);
   // Escribim la solucio en el fitxer de sortida.
   write(output_file_name, bestTeam);
+
+	cout << num_por << " " << num_def << " " << num_mig << " " << num_dav << " " << num_tot << endl;
+	cout << mu_por  << " " << mu_def  << " " << mu_mig  << " " << mu_dav  << " " << mu_tot  << endl;
 }
