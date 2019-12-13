@@ -8,15 +8,19 @@
 
 using namespace std;
 
+// Definim els parametres d'entrada de les consultes com a variables globals
 int n1, n2, n3, t, j;
 clock_t start_time;
 
+// Tambe definim el tamany total de la base de dades i la mitjana de preu
+// com a variables globals.
 int num_tot = 0;
 double mu_tot = 0;
 
 // Comptador global, perque cada jugador tingui un identificador unic.
 int player_count = 0;
 int getPlayerId() {return player_count++;}
+
 
 // Donat un string amb la posicio d'un jugador, la retorna amb numero.
 int getpos(string& pos) {
@@ -26,6 +30,7 @@ int getpos(string& pos) {
 	else if (pos == "dav") return 3;
 	return -1;
 }
+
 
 /*    STRUCT PLAYER
 - Conte la informacio basica del jugador (nom, club, posicio, preu i punts).
@@ -42,7 +47,7 @@ struct Player {
 	- Defineix un ordre entre els jugadors, tenint en compte els seus punts
 	  i el preu que tenen. A més, fa servir el parametre j, que representa
 		el cost màxim que pot tenir un jugador, com també utilitza la mitjana
-		total dels punts del jugadors, per tenir un varem de quina comparacio
+		total dels preus del jugadors, per tenir un varem de quina comparacio
 		es mes convenient utilitzar.
 	ATENCIO
 	Els coeficients utilitzats en aquesta ordenacio dels jugadors estan ajustats
@@ -60,6 +65,7 @@ struct Player {
 					 (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
 	}
 };
+
 
 vector<vector<Player>> PlayerDatabase(4);
 
@@ -99,7 +105,8 @@ struct Alignment {
 };
 
 
-// Funcio que imprimeix en un fitxer una alineacio
+// Funcio que imprimeix en un fitxer una alineacio, en el format demanat a
+// l'enunciat del projecte.
 void write(string& filename, Alignment& A) {
 	ofstream out;
 	out.open(filename);
@@ -128,6 +135,7 @@ void write(string& filename, Alignment& A) {
 	out << A.total_points << endl;
 	out.close();
 }
+
 
 // Lectura dels parametres d'entrada
 void read_query(string& filename) {
@@ -160,13 +168,14 @@ void read_database(string& filename) {
   in.close();
 }
 
+
 // Aquesta funcio deixa a ord la permutacio de {0,1,2,3} que respecta l'ordre
 // del vector pond.
 void ordre(vector<double>& pond, vector<int>& ord) {
 	ord = {0, 1, 2, 3};
-	for (int i = 0; i < (int)pond.size(); ++i) {
+	for (int i = 0; i < 4; ++i) {
 		int max_idx = i;
-		for (int j = i; j < (int)pond.size(); ++j) {
+		for (int j = i; j < 4; ++j) {
 			if (pond[j] > pond[max_idx]) max_idx = j;
 		}
 		swap(ord[i], ord[max_idx]);
@@ -199,7 +208,6 @@ void Greedy(Alignment& S) {
 
 	vector<int> ord(pond.size());
 	ordre(pond, ord);
-
 
 	vector<int> n = {1, n1, n2, n3};
   for (int database_idx: ord) {
@@ -236,6 +244,7 @@ int main(int argc, char** argv) {
   // Deduim quina es la millor alineacio que podem trobar.
 	Alignment bestTeam(n1, n2, n3);
   Greedy(bestTeam);
+
   // Escrivim la solucio en el fitxer de sortida.
   write(output_file_name, bestTeam);
 }
