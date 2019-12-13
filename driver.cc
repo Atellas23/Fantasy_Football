@@ -53,9 +53,9 @@ int main() {
     med_div += points1[i + 7] - points2[i + 7];
     hard_div += points1[i + 14] - points2[i + 14];
   }
-  cout << "And it is " << easy_div << " points better only considering the easy quaries." << endl;
-  cout << "And it is " << med_div  << " points better only considering the medium quaries." << endl;
-  cout << "And it is " << hard_div << " points better only considering the hard quaries." << endl;
+  cout << "And it is " << easy_div << " points better considering only the easy queries." << endl;
+  cout << "And it is " << med_div  << " points better considering only the medium queries." << endl;
+  cout << "And it is " << hard_div << " points better considering only the hard queries." << endl;
 
   //*/
 }
