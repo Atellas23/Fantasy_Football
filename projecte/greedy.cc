@@ -54,7 +54,7 @@ struct Player {
     /* 2. millora en mes del 60% pero em molesta */
 		// return double(points*points*points)/(pow(log(price + 2),1.25)) > double(J.points*J.points*J.points)/pow(log(J.price + 2),1.25);
     /* 3. funciona igual de be que 1 */
-		// if (points == J.points and points == 0) return price < J.price;
+		// if (points == J.points) return price < J.price;
   	// return points > J.points;
     /* COM A CONCLUSIO: diria que si ho provem amb les bases de dades per la
                         metaheuristica sortirem de dubtes, ja que tindrem mes
@@ -188,7 +188,7 @@ void Greedy(Alignment& S) {
 	vector<double> pond(4, 0);
 
   for (int k = 0; k < 4; ++k) {
-		double a = 0.15, b = 1;
+		double a = 0.2, b = 1;
     sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
 		for (int i = 0; i < (int)PlayerDatabase[k].size(); ++i) {
 			pond[k] += PlayerDatabase[k][i].points*b;
