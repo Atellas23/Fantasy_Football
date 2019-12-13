@@ -23,7 +23,7 @@ int main() {
     string new_command = command + queries[i];
     for (int j = 1; j < 8; ++j) {
       string new_new_command = new_command + to_string(j) + ".txt " + output;
-      cout << new_new_command << endl;
+      //cout << new_new_command << endl;
       system(new_new_command.c_str());
     }
   }
@@ -44,6 +44,9 @@ int main() {
   in.close();
   int div = 0;
   for (int k = 0; k < (int)points1.size(); ++k) div += points1[k] - points2[k];
+  cout << "Testing on comparator:\n";
+  system("grep COMP projecte/greedy.cc");
+  cout << endl;
   system("pr -m -t FITXER.txt FITXER2.txt");
   cout << "The data in \"FITXER.txt\" is " << div /*100*div/points1.size()*/ << " points better (in total) than the data in \"FITXER2.txt\".\n";
 

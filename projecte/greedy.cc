@@ -6,6 +6,10 @@
 #include <cassert>
 #include <cmath>
 
+/*
+COMP return (1.5*double(points) - 0.8*1e8*double(1)/(j - price)) > (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
+*/
+
 using namespace std;
 
 int n1, n2, n3, t, j;
@@ -106,9 +110,9 @@ struct Alignment {
 
 // Funcio que imprimeix en un fitxer una alineacio
 void write(string& filename, Alignment& A) {
-	cout << j << " " << t << endl;
+	/*cout << j << " " << t << endl;
 	cout << 1 << " " << n1 << " " << n2 << " " << n3 << endl;
-	cout << A[0].size() << " " << A[1].size() << " " << A[2].size() << " " << A[3].size() << endl;
+	cout << A[0].size() << " " << A[1].size() << " " << A[2].size() << " " << A[3].size() << endl;*/
 	ofstream out;
 	out.open(filename);
 	out.setf(ios::fixed);
