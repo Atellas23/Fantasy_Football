@@ -1,7 +1,1 @@
 0.0
-POR: Neto
-DEF: Piqué;Jordi Alba;Djené;Hermoso;Gayá
-MIG: Parejo;Campaña;Oyarzabal
-DAV: Jorge Molina;Charles
-Punts: 2424
-Preu: 236110750

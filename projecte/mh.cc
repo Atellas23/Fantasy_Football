@@ -12,22 +12,13 @@ using namespace std;
 
 // Definim els parametres d'entrada de les consultes com a variables globals
 int n1, n2, n3, t, j;
+vector<int> num_pos;
 clock_t start_time;
 
 // Tambe definim el tamany total de la base de dades i la mitjana de preu
 // com a variables globals.
 int num_tot = 0;
 double mu_tot = 0;
-
-
-
-/*
-default_random_engine generator;
-discrete_distribution<int> distribution(1,1,1,1,1,1,1,1,1,1);
-int chosen_at_random = distribution(generator);
-*/
-
-
 
 /* FUNCIO getpos
   - Donat un string amb la posicio d'un jugador, la retorna amb numero.
@@ -57,19 +48,15 @@ struct Player {
 			price(price), points(points) {}
 
   /* OPERADOR <
-	- Defineix un ordre entre els jugadors, tenint en compte els seus punts
-	  i el preu que tenen. A més, fa servir el parametre j, que representa
-		el cost màxim que pot tenir un jugador, com també utilitza la mitjana
-		total dels preus del jugadors, per tenir un varem de quina comparacio
-		es mes convenient utilitzar.
-	ATENCIO
-	Els coeficients utilitzats en aquesta ordenacio dels jugadors estan ajustats
-	per la base de dades inicial donada.
+
 	*/
 	bool operator< (const Player& J) {
-		// En el cas que la mitjana de preus dels jugadors disponibles sigui
-		// molt petita es millor ordenar segons aquest criteri. Altrament,
-		// es millor ordenar segons el que ve a continuacio.
+
+		if (price == 0) return false;
+		if (J.price == 0) return true;
+		return points/price > J.points/J.price;
+
+		/*
 		if (mu_tot < 1e6) {
 			if (points == J.points) return price < J.price;
 			if (price == 0) return false;
@@ -78,7 +65,8 @@ struct Player {
 						 double(J.points*J.points)/pow(log(J.price), 16);
 		}
 		return (1.5*double(points)   - 0.8*1e8*double(1)/(j - price)) >
-					 (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
+					 (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price
+		*/
 	}
 };
 
@@ -116,11 +104,11 @@ struct Alignment {
 	// OPERADOR
 	vector<Player>& operator[] (int idx) {return aln[idx];}
 
-	/* METODE addPlayer
+	/* METODE add_player
 		- Requereix un jugador i la posicio en la que el vols possar.
 		- Actualitza els punts i el preu de l'equip.
 	*/
-	void addPlayer (const Player& J, int i) {
+	void add_player (const Player& J, int i) {
 		total_points += J.points;
 		total_price  += J.price;
   	aln[i].push_back(J);
@@ -138,7 +126,7 @@ void write(string& filename, Alignment& A) {
 	out.setf(ios::fixed);
 	out.precision(1);
 	clock_t t = clock() - start_time;
-
+	cout << A[1].size() << endl;
 	out << double(t)/CLOCKS_PER_SEC << endl
 			<< "POR: " << A[0][0].name << endl
 			<< "DEF: ";
@@ -152,6 +140,7 @@ void write(string& filename, Alignment& A) {
 	out << endl
 			<< "Punts: " << A.total_points << endl
 			<< "Preu: "  << A.total_price << endl;
+  cout << "HHHHHHHHHH" << endl;
 	out.close();
 }
 
@@ -162,6 +151,7 @@ void write(string& filename, Alignment& A) {
 void read_query(string& filename) {
 	ifstream in(filename);
 	in >> n1 >> n2 >> n3 >> t >> j;
+	num_pos = {1, n1, n2, n3};
 }
 
 /* FUNCIO read_database
@@ -191,34 +181,123 @@ void read_database(string& filename) {
 }
 
 // ********* FUNCIONS AUXILIARS **********
+vector<vector<int>> permutations;
+vector<int> vec;
+vector<bool> used;
+
+/* FUNCIO rec
+	- Requereix d'un index posicio i un identificador id, ambdos enters.
+	- pos: guarda fins a quina posicio esta construida una permutacio nova a vec.
+	- id: guarda per quina permutacio anem.
+
+	- Aquesta funcio emplena amb les 24 permutacions de {0,1,2,3}
+	  la matriu permutations.
+*/
+void rec(int pos, int& id) {
+	if (pos == 4) {
+		permutations[id] = vec;
+		++id;
+		return;
+	}
+
+	for (int i = 0; i < 4; ++i) {
+		if (not used[i]) {
+			used[i] = true;
+			vec[pos] = i;
+			rec(pos + 1, id);
+			used[i] = false;
+		}
+	}
+}
+
+/* FUNCIO fill_permutations
+	- No requereix de cap parametre.
+	- Aquesta funcio fa els preparatius per emplenar la matriu permutations amb
+	  les permutacions de {0,1,2,3}. Posteriorment crida a la funcio rec que
+		les calcula i les guarda.
+*/
+void fill_permutations() {
+	// matriu permutations: a cada fila guarda una permutacio de {0,1,2,3}.
+	permutations = vector<vector<int>> (24, vector<int> (4));
+	// vector auxiliar vec: guarda cada permutacio mentre es construeix.
+	vec = vector<int> (4);
+	// vector auxiliar used: guarda quins nombres hi ha al vector vec.
+	used = vector<bool> (4, false);
+	// enter id: guarda quantes permutacions s'ha trobat en cada moment.
+	int id = 0;
+
+	// crida a la funcio que emplena la matriu de pemutacions.
+	rec(0, id);
+}
+
+/*
+default_random_engine generator;
+discrete_distribution<int> distribution(1,1,1,1,1,1,1,1,1,1);
+int chosen_at_random = distribution(generator);
+*/
+
+
 void local_search();
 
-int determine_candidate_list_length();
+vector<int> determine_candidate_list_length() {
+	vector<int> v;
 
-vector<Player> restricted_candidate_list();
+	// alfa pels porters
+	v.push_back(1+floor(PlayerDatabase[0].size()/10));
+	// alfa pels defenses
+	v.push_back(n1+floor(PlayerDatabase[1].size()/10));
+	// alfa pels migcampistes
+	v.push_back(n2+floor(PlayerDatabase[2].size()/10));
+	// alfa pels davanters
+	v.push_back(n3+floor(PlayerDatabase[3].size()/10));
 
-vector<Player> select_element_at_random();
-
-Alignment construt_greedy_randomized_solution() {
-  Alignment s(n1, n2, n3, t, j);
-  int alpha = determine_candidate_list_length();
-  while (solution not complete) {
-    vector<Player> RCL = restricted_candidate_list(alpha);
-    Player x = select_element_at_random(RCL);
-    s.add_player(x, x.npos);
-    update_greedy_function();
-  }
-  return s;
+	return v;
 }
+
+vector<int> restricted_candidate_list(int x, int alpha) {
+	vector<int> v;
+	for (int i = 0; i < alpha; ++i)
+		if (PlayerDatabase[x][i].price < t) v.push_back(i);
+	return v;
+}
+
+Player select_element_at_random(vector<int>& RCL) {
+	// FABRIQUEM FUNCIO DE DISTRIBUCIO
+	// ESCULLIM UN AL ATZAR
+	// RETORNEM JUGADOR
+	return PlayerDatabase[0][0];
+}
+
+Alignment construt_greedy_randomized_solution(int id_perm) {
+  Alignment s(n1, n2, n3, t, j);
+  vector<int> alpha = determine_candidate_list_length();
+
+	for (int x: permutations[id_perm]) {
+		for (int i = 0; i < num_pos[x]; ++i) {
+			vector<int> RCL = restricted_candidate_list(x, alpha[x]);
+			Player P = select_element_at_random(RCL);
+			s.add_player(P, P.npos);
+		}
+	}
+
+	return s;
+}
+
 
 // ******** FUNCIO METAHEURISTIC *********
 void metaheuristic() {
-  while () {
-    s = construt_greedy_randomized_solution();
-    s = local_search(s);
-    is_it_better(s);
+	  Alignment s(n1, n2, n3, t, j);
+
+	// call of the functions that fills the pemutation matrix.
+	fill_permutations();
+
+  for (int i = 0; i < 24; ++i) {
+    s = construt_greedy_randomized_solution(i);
+    // s = local_search(s);
+    // is_it_better(s);
   }
 }
+
 
 // ************ FUNCIO MAIN **************
 
@@ -240,8 +319,9 @@ int main(int argc, char** argv) {
 
   // Deduim quina es la millor alineacio que podem trobar.
 	Alignment bestTeam(n1, n2, n3);
-  Greedy(bestTeam);
+
 
   // Escrivim la solucio en el fitxer de sortida.
-  write(output_file_name, bestTeam);
+  // write(output_file_name, bestTeam);
+
 }
