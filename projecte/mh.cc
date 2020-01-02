@@ -5,12 +5,15 @@
 #include <ctime>
 #include <cmath>
 
-// ethrthggvrth
+// Aplicarem la metaheurística GRASP al nostre problema.
+
+// Importem la llibreria random, fonamental per a
+// l'esquema metaheurístic que hem decidit aplicar.
 #include <random>
 
 using namespace std;
 
-// Definim els parametres d'entrada de les consultes com a variables globals
+// Definim els parametres d'entrada de les consultes com a variables globals.
 int n1, n2, n3, t, j;
 vector<int> num_pos;
 clock_t start_time;
@@ -230,14 +233,9 @@ void fill_permutations() {
 	rec(0, id);
 }
 
-/*
-default_random_engine generator;
-discrete_distribution<int> distribution(1,1,1,1,1,1,1,1,1,1);
-int chosen_at_random = distribution(generator);
-*/
-
 
 void local_search();
+
 
 vector<int> determine_candidate_list_length() {
 	vector<int> v;
@@ -261,11 +259,20 @@ vector<int> restricted_candidate_list(int x, int alpha) {
 	return v;
 }
 
-Player select_element_at_random(vector<int>& RCL) {
+Player select_element_at_random(int source, vector<int>& RCL) {
+	default_random_engine gen;
+	vector<double> weights;
+	// Omplim el vector weights amb els scores
+	// donats a cada membre de la RCL.
+	/*
+	for (coses in coses) do coses;
+	*/
 	// FABRIQUEM FUNCIO DE DISTRIBUCIO
-	// ESCULLIM UN AL ATZAR
+	discrete_distribution<int> d(weights.begin(), weights.end());
+	// ESCOLLIM UN AL ATZAR
+	int chosen_at_random = d(gen);
 	// RETORNEM JUGADOR
-	return PlayerDatabase[0][0];
+	return PlayerDatabase[source][chosen_at_random];
 }
 
 Alignment construt_greedy_randomized_solution(int id_perm) {
@@ -275,7 +282,7 @@ Alignment construt_greedy_randomized_solution(int id_perm) {
 	for (int x: permutations[id_perm]) {
 		for (int i = 0; i < num_pos[x]; ++i) {
 			vector<int> RCL = restricted_candidate_list(x, alpha[x]);
-			Player P = select_element_at_random(RCL);
+			Player P = select_element_at_random(x, RCL);
 			s.add_player(P, P.npos);
 		}
 	}
