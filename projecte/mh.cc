@@ -298,7 +298,9 @@ bool improve1(Alignment& s) {
 	return false;
 }
 
+
 bool improve2(Alignment& s) {
+	// Simulated Annealing
 	int r = rand() % 24; // Nombre aleatori del 0 al 23
 	for (int x: permutations[r]) {
 		for (int i = 0; i < (int)PlayerDatabase[x].size()/100; ++i) {
@@ -331,12 +333,44 @@ bool improve2(Alignment& s) {
 }
 
 
+Alignment shuffle_in_neighbourhood(const Alignment& s)
+	Alignment res = s; // Copiem l'original.
+	int r = rand() % 24; // Nombre aleatori del 0 al 23.
+	default_random_engine gen;
+	for (int x: permutations[r]) {
+		uniform_int_distribution d1(0, PlayerDatabase[x].size()/100);
+		Player P = PlayerDatabase[x][d1(gen)];
+		uniform_int_distribution d2(0, num_pos[x]);
+		int rand_idx = d2(gen);
+		string comentari_vistos =
+"CANVIAR EL JUGADOR DE L'INDEX RAND_IDX DE L'ALINEACIO PEL JUGADOR TRIAT"
+"ALEATORIAMENT DE LA SEVA BASE DE DADES";
+
+		res.change_player(P, x, );
+	}
+	return res;
+}
+
+void simulated_annealing(Alignment& s) {
+	double T = T_0;
+	while (termination_conditions_not_met) {
+		Alignment s2 = shuffle_in_neighbourhood(s);
+		if (s2.total_points > s.total_points) s = s2;
+		else {
+			default_random_engine gen;
+			bernoulli_distribution d(exp(-double(s.total_points-s2.total_points)/T));
+			if (d(gen)) s = s2;
+		}
+		T *= 0.75;
+	}
+}
+
 
 void local_search(Alignment& s) {
 	Alignment best = s;
-	/*for (int i = 0; improve1(s) and i < 1000; ++i) {
+	for (int i = 0; improve1(s) and i < 1000; ++i) {
 		if (s.total_points > best.total_points) best = s;
-	}*/
+	}
 
 
 	for (int i = 0; improve2(s) and i < 100; ++i) {
@@ -410,14 +444,20 @@ void metaheuristic(Alignment& bestTeam) {
   for (int i = 0; i < 24; ++i) {
 		t = budget;
     s = construct_greedy_randomized_solution(i);
-		cout << "i: " << i << endl;
+
+		//cout << "i: " << i << endl;
+
 		//cout << "PUNTS: " << s.total_points << endl;
-		cout << "PREU: " << s.total_price << endl;
+
+		//cout << "PREU: " << s.total_price << endl;
+
 		//cout << "t: " << t << endl;
 		//cout << "DIFERENCIA: " << hhhhhhhhhhhhh - s.total_price << endl;
     local_search(s);
 		//cout << "PUNTS: " << s.total_points << endl;
-		cout << "PREU: " << s.total_price << endl;
+
+		//cout << "PREU: " << s.total_price << endl;
+
 		//cout << "t: " << t << endl;
 		//cout << "DIFERENCIA: " << hhhhhhhhhhhhh - s.total_price << endl;
     if (s.total_points > bestTeam.total_points) bestTeam = s;
@@ -449,9 +489,9 @@ int main(int argc, char** argv) {
   // Escrivim la solucio en el fitxer de sortida.
   write(output_file_name, bestTeam);
 
-	cout << bestTeam.total_points << endl;
+	/*cout << bestTeam.total_points << endl;
 	cout << hhhhhhhhhhhhh << " - " << bestTeam.total_price << " = " <<
-	 				hhhhhhhhhhhhh - bestTeam.total_price << endl;
+	 				hhhhhhhhhhhhh - bestTeam.total_price << endl;*/
 }
 /*
 Els optims que anteriorment es trobaven aqui

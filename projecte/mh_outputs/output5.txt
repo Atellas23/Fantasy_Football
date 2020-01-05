@@ -1,7 +1,7 @@
-4.2
-POR: id-252-70
-DEF: id-676-8;id-676-8;id-676-8;id-676-8
-MIG: id-2293-28;id-2293-28;id-2293-26
+4.5
+POR: id-252-94
+DEF: id-676-8;id-676-8;idBis-521;idBis-521
+MIG: id-2293-73;id-2293-28;id-2560-92
 DAV: idBis-3016;idBis-3016;idBis-3016
-Punts: 1211797
-Preu: 248700443
+Punts: 1211121
+Preu: 249825393
