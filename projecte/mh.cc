@@ -320,11 +320,12 @@ bool improve2(Alignment& s) {
 						s.change_player(P, x, j);
 						return true;
 				}
-
+				// Per escapar dels minims locals,
+				// posem que es pot empitjorar una
+				// solucio el 4.9% de les vegades.
 				if (P.price <= s[x][j].price*0.9 and P.points >= s[x][j].points*0.9) {
 					int prob = rand() % 1000;
 					if (prob > 950) {
-						cout << "somehow he entrat aqui\n";
 						t -= P.price;
 						t += s[x][j].price;
 						s.change_player(P, x, j);
