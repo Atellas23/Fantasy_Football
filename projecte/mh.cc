@@ -207,6 +207,7 @@ vector<bool> used;
 
 
 // ********* GRASP: FASE 1 *******************
+// Construccio d'una solucio aproximada.
 
 /* FUNCIO determine_candidate_list_length
 	- No requereix de cap parametre
@@ -305,6 +306,9 @@ Alignment construct_greedy_randomized_solution(int id_perm) {
 	}
 	return s;
 }
+
+// ************ GRASP: FASE 2 *********************
+// Millora de l'aproximacio obtinguda a la fase 1.
 
 // ************ CERCA LOCAL ****************
 
@@ -407,7 +411,6 @@ void local_search(Alignment& s) {
 	s = best;
 }
 
-// ************ GRASP: FASE 2 *********************
 
 /* FUNCIO rec
 	- Requereix d'un index posicio i d'un identificador id, ambdos enters.
