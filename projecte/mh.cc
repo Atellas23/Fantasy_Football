@@ -353,7 +353,7 @@ Alignment shuffle_in_neighbourhood(const Alignment& s)
 
 void simulated_annealing(Alignment& s) {
 	double T = T_0;
-	while (termination_conditions_not_met) {
+	while (T > 0.01) {
 		Alignment s2 = shuffle_in_neighbourhood(s);
 		if (s2.total_points > s.total_points) s = s2;
 		else {
