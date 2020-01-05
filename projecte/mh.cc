@@ -272,6 +272,7 @@ Alignment construct_greedy_randomized_solution(int id_perm) {
 
 // ************ METAHEURISTICA: CERCA LOCAL ****************
 
+/*
 bool improve1(Alignment& s) {
 	int r = rand() % 24; // Nombre aleatori del 0 al 23
 	for (int x: permutations[r]) {
@@ -302,10 +303,10 @@ bool improve1(Alignment& s) {
 
 	return false;
 }
-
+*/
 
 bool improve2(Alignment& s) {
-	// Simulated Annealing
+	// Simulated Annealing sort of
 	int r = rand() % 24; // Nombre aleatori del 0 al 23
 	for (int x: permutations[r]) {
 		for (int i = 0; i < (int)PlayerDatabase[x].size()/100; ++i) {
@@ -318,12 +319,11 @@ bool improve2(Alignment& s) {
 						t += s[x][j].price;
 						s.change_player(P, x, j);
 						return true;
-
 				}
 
 				if (P.price <= s[x][j].price*0.9 and P.points >= s[x][j].points*0.9) {
 					int prob = rand() % 1000;
-					if (prob > 999) {
+					if (prob > 950) {
 						cout << "somehow he entrat aqui\n";
 						t -= P.price;
 						t += s[x][j].price;
@@ -344,7 +344,7 @@ void local_search(Alignment& s) {
 		if (s.total_points > best.total_points) best = s;
 	}*/
 
-	for (int i = 0; improve2(s) and i < 100; ++i) {
+	for (int i = 0; improve2(s) and i < 1000; ++i) {
 		if (s.total_points > best.total_points) best = s;
 	}
 

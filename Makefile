@@ -14,4 +14,4 @@ update:
 	@echo "done!"
 
 compile:
-	g++ -Wall -D_GLIBCXX_DEBUG $(name).cc -o $(name).out
+	g++ -Wall -O3 -D_GLIBCXX_DEBUG $(name).cc -o $(name).out
