@@ -109,6 +109,10 @@ struct Alignment {
 	Alignment (int n1, int n2, int n3, int totP = 0, int pr = 0):
   	aln(vector< vector<Player> >(4)), n1(n1), n2(n2), n3(n3),
     total_points(totP), total_price(pr) {}
+	// CONSTRUCTOR COPIA
+	Alignment(const Alignment& source):
+		aln(source.aln), n1(source.n1), n2(source.n2), n3(source.n3),
+		total_points(source.total_points), total_price(source.total_price) {}
 
 	// OPERADOR
 	vector<Player>& operator[] (int idx) {return aln[idx];}
@@ -191,6 +195,7 @@ void read_database(string& filename) {
 		if (preu <= j) {
 			Player jugador(nom, posicio, preu, club, punts);
 			PlayerDatabase[jugador.npos].push_back(jugador);
+			++num_tot;
 		}
   }
   in.close();
@@ -319,6 +324,7 @@ bool improve2(Alignment& s) {
 				if (P.price <= s[x][j].price*0.9 and P.points >= s[x][j].points*0.9) {
 					int prob = rand() % 1000;
 					if (prob > 999) {
+						cout << "somehow he entrat aqui\n";
 						t -= P.price;
 						t += s[x][j].price;
 						s.change_player(P, x, j);
@@ -332,45 +338,11 @@ bool improve2(Alignment& s) {
 	return false;
 }
 
-
-Alignment shuffle_in_neighbourhood(const Alignment& s)
-	Alignment res = s; // Copiem l'original.
-	int r = rand() % 24; // Nombre aleatori del 0 al 23.
-	default_random_engine gen;
-	for (int x: permutations[r]) {
-		uniform_int_distribution d1(0, PlayerDatabase[x].size()/100);
-		Player P = PlayerDatabase[x][d1(gen)];
-		uniform_int_distribution d2(0, num_pos[x]);
-		int rand_idx = d2(gen);
-		string comentari_vistos =
-"CANVIAR EL JUGADOR DE L'INDEX RAND_IDX DE L'ALINEACIO PEL JUGADOR TRIAT"
-"ALEATORIAMENT DE LA SEVA BASE DE DADES";
-		res.change_player(P, x, );
-	}
-	return res;
-}
-
-void simulated_annealing(Alignment& s) {
-	double T = T_0;
-	while (T > 0.01) {
-		Alignment s2 = shuffle_in_neighbourhood(s);
-		if (s2.total_points > s.total_points) s = s2;
-		else {
-			default_random_engine gen;
-			bernoulli_distribution d(exp(-double(s.total_points-s2.total_points)/T));
-			if (d(gen)) s = s2;
-		}
-		T *= 0.75;
-	}
-}
-
-
 void local_search(Alignment& s) {
 	Alignment best = s;
-	for (int i = 0; improve1(s) and i < 1000; ++i) {
+	/*for (int i = 0; improve1(s) and i < 1000; ++i) {
 		if (s.total_points > best.total_points) best = s;
-	}
-
+	}*/
 
 	for (int i = 0; improve2(s) and i < 100; ++i) {
 		if (s.total_points > best.total_points) best = s;
