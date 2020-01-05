@@ -402,7 +402,7 @@ void metaheuristic(Alignment& bestTeam) {
 		cout << "i: " << i << endl;
 		cout << "PUNTS: " << s.total_points << endl;
 		cout << "PREU: " << s.total_price << endl;
-		cout << t
+		cout << t;
     if (s.total_points > bestTeam.total_points) bestTeam = s;
   }
 }
