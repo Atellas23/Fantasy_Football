@@ -1,0 +1,7 @@
+4.3
+POR: id-228-10
+DEF: id-372-69;id-505-38;id-505-38
+MIG: id-1839-9;id-1839-28;idBis-2336;idBis-2336;idBis-2336
+DAV: id-2829-92;idBis-3163
+Punts: 1211327
+Preu: 249677002

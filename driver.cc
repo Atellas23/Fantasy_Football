@@ -1,32 +1,30 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-bool exists(const string& name) {
+/*bool exists(const string& name) {
     ifstream f(name.c_str());
     return f.good();
-}
+*/
 
 int main() {
-  if (exists("FITXER.txt")) system("mv FITXER.txt FITXER2.txt");
-  system("make compile name=projecte/greedy");
-  string database = "projecte/data_base.txt";
-  string output = "projecte/output.txt";
-  vector<string> queries = {
-    "projecte/public_benchs/easy-",
-    "projecte/public_benchs/med-",
-    "projecte/public_benchs/hard-"
-  };
-  //cout << database + queries[1] << endl;
-  for (int i = 0; i < 3; ++i) {
-    string command = "./projecte/greedy.out ";
-    command += database + " ";
-    string new_command = command + queries[i];
-    for (int j = 1; j < 8; ++j) {
-      string new_new_command = new_command + to_string(j) + ".txt " + output;
-      //cout << new_new_command << endl;
-      system(new_new_command.c_str());
-    }
+  system("make compile name=projecte/mh");
+  string database = "projecte/diff_benchs/data_base";
+  string output = "projecte/mh_outputs/output";
+  string query = "projecte/diff_benchs/query";
+  system(" > projecte/mh_outputs/summary_so_far.txt");
+  for (int i = 1; i < 12; ++i) {
+    string command = "./projecte/mh.out ";
+    string where = output + to_string(i) + ".txt";
+    command += database + to_string(i) + ".txt "
+    + query + to_string(i) + ".txt "
+    + where;
+    system(command.c_str());
+    system(("echo projecte/query" + to_string(i) + ".txt >> projecte/mh_outputs/summary_so_far.txt").c_str());
+    string command2 = "grep \"Punts:\" " + where + " >> projecte/mh_outputs/summary_so_far.txt";
+    system(command2.c_str());
+    //system("echo \n >> summary_so_far.txt");
   }
+  system("pr -m -t projecte/mh_outputs/outputs_max.txt projecte/mh_outputs/summary_so_far.txt");
   /*
   vector<int> points1, points2;
   ifstream in1("FITXER.txt"), in2("FITXER2.txt");

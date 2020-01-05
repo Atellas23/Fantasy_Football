@@ -247,7 +247,7 @@ Player select_element_at_random(int x, vector<int>& RCL) {
 	return PlayerDatabase[x][RCL[chosen_at_random]];
 }
 
-Alignment construt_greedy_randomized_solution(int id_perm) {
+Alignment construct_greedy_randomized_solution(int id_perm) {
   Alignment s(n1, n2, n3);
   vector<int> alpha = determine_candidate_list_length();
 	for (int x: permutations[id_perm]) {
@@ -404,7 +404,7 @@ void metaheuristic(Alignment& bestTeam) {
 
   for (int i = 0; i < 24; ++i) {
 		t = budget;
-    s = construt_greedy_randomized_solution(i);
+    s = construct_greedy_randomized_solution(i);
 		cout << "i: " << i << endl;
 		//cout << "PUNTS: " << s.total_points << endl;
 		cout << "PREU: " << s.total_price << endl;

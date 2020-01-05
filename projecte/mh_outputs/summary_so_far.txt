@@ -1,0 +1,8 @@
+projecte/query1.txt
+Punts: 1211327
+projecte/query2.txt
+Punts: 1212002
+projecte/query3.txt
+Punts: 1212203
+projecte/query4.txt
+Punts: 1211278
