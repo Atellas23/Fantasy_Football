@@ -58,7 +58,7 @@ struct Player {
 
 		if (price == 0) return false;
 		if (J.price == 0) return true;
-		return points/price > J.points/J.price;
+		return points> J.points;
 
 		/*
 		if (mu_tot < 1e6) {
@@ -265,24 +265,24 @@ Alignment construt_greedy_randomized_solution(int id_perm) {
 bool improve1(Alignment& s) {
 	int r = rand() % 24; // Nombre aleatori del 0 al 23
 	for (int x: permutations[r]) {
-		for (int i = 0; i < (int)PlayerDatabase[x].size()/50; ++i) {
+		for (int i = 0; i < (int)PlayerDatabase[x].size()/100; ++i) {
 			Player P = PlayerDatabase[x][i];
 			for (int j = 0; j < num_pos[x]; ++j) {
 				if (((P.points >= s[x][j].points and P.price < s[x][j].price) or
 				    (P.points > s[x][j].points and P.price <= s[x][j].price))
 						and (P.name != s[x][j].name)) {
-						s.change_player(P, x, j);
 						t -= P.price;
 						t += s[x][j].price;
+						s.change_player(P, x, j);
 						return true;
 				}
 
 				if (P.price <= s[x][j].price*0.9 and P.points >= s[x][j].points*0.9) {
 					int prob = rand() % 1000;
 					if (prob > 950) {
-						s.change_player(P, x, j);
 						t -= P.price;
 						t += s[x][j].price;
+						s.change_player(P, x, j);
 						return true;
 					}
 				}
@@ -296,7 +296,7 @@ bool improve1(Alignment& s) {
 bool improve2(Alignment& s) {
 	int r = rand() % 24; // Nombre aleatori del 0 al 23
 	for (int x: permutations[r]) {
-		for (int i = 0; i < (int)PlayerDatabase[x].size()/10; ++i) {
+		for (int i = 0; i < (int)PlayerDatabase[x].size()/100; ++i) {
 			Player P = PlayerDatabase[x][i];
 			for (int j = 0; j < num_pos[x]; ++j) {
 				if (((P.points >= s[x][j].points and P.price < s[x][j].price + t) or
@@ -329,12 +329,14 @@ bool improve2(Alignment& s) {
 
 void local_search(Alignment& s) {
 	Alignment best = s;
-	for (int i = 0; improve1(s) and i < 100; ++i)
+	for (int i = 0; improve1(s) and i < 1000; ++i) {
 		if (s.total_points > best.total_points) best = s;
+	}
 
 
-	for (int i = 0; improve2(s) and i < 1000; ++i)
+	for (int i = 0; improve2(s) and i < 100; ++i) {
 		if (s.total_points > best.total_points) best = s;
+	}
 
 	s = best;
 }
@@ -393,17 +395,26 @@ void metaheuristic(Alignment& bestTeam) {
 	// Crida a la funcio que emplena la matriu de permutacions.
 	fill_permutations();
 
+
+	for (int k = 0; k < 4; ++k)
+		sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
+
+
 	int budget = t;
 
   for (int i = 0; i < 24; ++i) {
 		t = budget;
     s = construt_greedy_randomized_solution(i);
-    local_search(s);
 		cout << "i: " << i << endl;
-		cout << "PUNTS: " << s.total_points << endl;
+		//cout << "PUNTS: " << s.total_points << endl;
 		cout << "PREU: " << s.total_price << endl;
-		cout << "t: " << t << endl;
-		cout << "DIFERENCIA: " << hhhhhhhhhhhhh - s.total_price << endl;
+		//cout << "t: " << t << endl;
+		//cout << "DIFERENCIA: " << hhhhhhhhhhhhh - s.total_price << endl;
+    local_search(s);
+		//cout << "PUNTS: " << s.total_points << endl;
+		cout << "PREU: " << s.total_price << endl;
+		//cout << "t: " << t << endl;
+		//cout << "DIFERENCIA: " << hhhhhhhhhhhhh - s.total_price << endl;
     if (s.total_points > bestTeam.total_points) bestTeam = s;
   }
 }
@@ -437,3 +448,10 @@ int main(int argc, char** argv) {
 	cout << hhhhhhhhhhhhh << " - " << bestTeam.total_price << " = " <<
 	 				hhhhhhhhhhhhh - bestTeam.total_price << endl;
 }
+/*
+
+
+
+
+
+*/
