@@ -52,30 +52,29 @@ struct Player {
 			price(price), points(points) {}
 
   /* OPERADOR <
-
+		- Ordre entre els jugdors, utilitza els punts i el preu que tenen.
 	*/
 	bool operator< (const Player& J) {
+		int a = j - price;
+		int b = j - J.price;
 
+		if (a != 0 and b != 0) {
+			return (1.5*double(points)   - 0.8*1e8*double(1)/(a)) >
+						 (1.5*double(J.points) - 0.8*1e8*double(1)/(b));
 
-		return (1.5*double(points)   - 0.8*1e8*double(1)/(j - price)) >
-					 (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
+		} else if (a != 0) {
+			return (1.5*double(points)   - 0.8*1e8*double(1)/(a)) >
+						 (1.5*double(J.points) - 0.8*1e8*double(1)/(1 + b));
 
+		} else if (b != 0) {
+			return (1.5*double(points)   - 0.8*1e8*double(1)/(1 + a)) >
+						 (1.5*double(J.points) - 0.8*1e8*double(1)/(b));
 
-		/*if (price == 0) return false;
-		if (J.price == 0) return true;
-		return points > J.points;*/
+		} else {
+			return (1.5*double(points)   - 0.8*1e8*double(1)/(1 + a)) >
+						 (1.5*double(J.points) - 0.8*1e8*double(1)/(1 + b));
 
-		/*
-		if (mu_tot < 1e6) {
-			if (points == J.points) return price < J.price;
-			if (price == 0) return false;
-			if (J.price == 0) return true;
-	  	return double(points*points)    /pow(log(price), 16) >
-						 double(J.points*J.points)/pow(log(J.price), 16);
 		}
-		return (1.5*double(points)   - 0.8*1e8*double(1)/(j - price)) >
-					 (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
-		*/
 	}
 };
 
@@ -208,21 +207,38 @@ vector<int> vec;
 vector<bool> used;
 
 
-// ********* METAHEURISTICA: FASE 1 *******************
+// ********* GRASP: FASE 1 *******************
+
+/* FUCNIO determine_candidate_list_length
+	- No requereix de cap parametre
+
+	- Retorna un vector de 4 elements amb el nombre de jugadors
+		que tindra la llista de candidats.
+
+*/
 vector<int> determine_candidate_list_length() {
 	vector<int> v;
 
 	// alfa pels porters
-	v.push_back(1+floor(PlayerDatabase[0].size()/10));
+	v.push_back(1+floor(PlayerDatabase[0].size()/50));
 	// alfa pels defenses
-	v.push_back(n1+floor(PlayerDatabase[1].size()/10));
+	v.push_back(n1+floor(PlayerDatabase[1].size()/50));
 	// alfa pels migcampistes
-	v.push_back(n2+floor(PlayerDatabase[2].size()/10));
+	v.push_back(n2+floor(PlayerDatabase[2].size()/50));
 	// alfa pels davanters
-	v.push_back(n3+floor(PlayerDatabase[3].size()/10));
+	v.push_back(n3+floor(PlayerDatabase[3].size()/50));
 	return v;
 }
 
+/* FUNCIO restricted_candidate_list
+	- Requereix de la posicio dels jugadors x, i alpha
+		que es el nombre maxim d'elements que tindra la llista
+		de candidats.
+
+	- Retorna una llista de jugadors el preu dels quals es
+	  inferior al pressupost actual restant.
+
+*/
 vector<int> restricted_candidate_list(int x, int alpha) {
 	vector<int> v;
 	int i = 0;
@@ -237,6 +253,14 @@ vector<int> restricted_candidate_list(int x, int alpha) {
 	return v;
 }
 
+/* FUNCIO select_element_at_random
+	- Requeix de la posicio dels jugadors x i la llista
+	  de jugadors candidats RCL.
+
+	- Escull aleatoriament un jugador de RCL, amb probabilitat
+  	punts/suma(punts de tots els jugadors).
+*/
+
 Player select_element_at_random(int x, vector<int>& RCL) {
 	default_random_engine gen;
 	vector<double> weights;
@@ -245,18 +269,26 @@ Player select_element_at_random(int x, vector<int>& RCL) {
 	for (int i = 0; i < (int)RCL.size(); ++i) {
 		weights.push_back(PlayerDatabase[x][RCL[i]].points);
 	}
-	// FABRIQUEM FUNCIO DE DISTRIBUCIO
+	// Fabriquem la funcio de distribucio.
 	discrete_distribution<int> d(weights.begin(), weights.end());
 
-	// ESCOLLIM UN AL ATZAR
+	// Escollim un jugador a l'altzar
 	int chosen_at_random = d(gen);
 
+	// Actualitzem el pressupost.
 	t -= PlayerDatabase[x][RCL[chosen_at_random]].price;
 
-	// RETORNEM JUGADOR
+	// Retorna el jugador.
 	return PlayerDatabase[x][RCL[chosen_at_random]];
 }
 
+/* FUNCIO construct_greedy_randomized_solution
+	- Requeix de l'index de la permutacio que fara servir.
+
+	- Es la funcio principal de la FASE 2. Construix una
+	  Alineacio inicial que aproxima la solucio.
+
+*/
 Alignment construct_greedy_randomized_solution(int id_perm) {
   Alignment s(n1, n2, n3);
   vector<int> alpha = determine_candidate_list_length();
@@ -270,32 +302,29 @@ Alignment construct_greedy_randomized_solution(int id_perm) {
 	return s;
 }
 
-// ************ METAHEURISTICA: CERCA LOCAL ****************
+// ************ CERCA LOCAL ****************
 
-/*
-bool improve1(Alignment& s) {
-	int r = rand() % 24; // Nombre aleatori del 0 al 23
+/* FUNCIO Basic_local_search
+	- Requereix d'una solucio inicial s per millorar.
+
+	- Quan troba una millora, la aplica i para.
+*/
+bool Basic_local_search(Alignment& s) {
+	int r = rand() % 24; // Nombre aleatori del 0 al 23.
+
+	// Primer permuta per cada posicio.
 	for (int x: permutations[r]) {
+		// Segon permuta pels primers jugadors de la base de dades.
 		for (int i = 0; i < (int)PlayerDatabase[x].size()/100; ++i) {
 			Player P = PlayerDatabase[x][i];
 			for (int j = 0; j < num_pos[x]; ++j) {
-				if (((P.points >= s[x][j].points and P.price < s[x][j].price) or
-				    (P.points > s[x][j].points and P.price <= s[x][j].price))
+				if (((P.points >= s[x][j].points and P.price < s[x][j].price + t) or
+				    (P.points > s[x][j].points and P.price <= s[x][j].price + t))
 						and (P.name != s[x][j].name)) {
 						t -= P.price;
 						t += s[x][j].price;
 						s.change_player(P, x, j);
 						return true;
-				}
-
-				if (P.price <= s[x][j].price*0.9 and P.points >= s[x][j].points*0.9) {
-					int prob = rand() % 1000;
-					if (prob > 950) {
-						t -= P.price;
-						t += s[x][j].price;
-						s.change_player(P, x, j);
-						return true;
-					}
 				}
 			}
 		}
@@ -303,12 +332,23 @@ bool improve1(Alignment& s) {
 
 	return false;
 }
-*/
 
-bool improve2(Alignment& s) {
-	// Simulated Annealing sort of
+
+/* FUNCIO improve
+	- Requereix d'una solucio inicial s per millorar.
+
+	- Es tracte d'una cerca local (semblant a Simulated Annealing)
+	  la qual canvia l'alineacio donada per, o bé, una
+		alineacio estricatament millor, o bé, amb una petita probabilitat,
+		amb una alineacio una mica pitjor.
+
+*/
+bool improve (Alignment& s) {
 	int r = rand() % 24; // Nombre aleatori del 0 al 23
+
+	// Primer permuta per cada posicio.
 	for (int x: permutations[r]) {
+		// Segon permuta pels primers jugadors de la base de dades.
 		for (int i = 0; i < (int)PlayerDatabase[x].size()/100; ++i) {
 			Player P = PlayerDatabase[x][i];
 			for (int j = 0; j < num_pos[x]; ++j) {
@@ -322,10 +362,10 @@ bool improve2(Alignment& s) {
 				}
 				// Per escapar dels minims locals,
 				// posem que es pot empitjorar una
-				// solucio el 4.9% de les vegades.
+				// solucio el 5.00% de les vegades.
 				if (P.price <= s[x][j].price*0.9 and P.points >= s[x][j].points*0.9) {
 					int prob = rand() % 1000;
-					if (prob > 950) {
+					if (prob > 949) {
 						t -= P.price;
 						t += s[x][j].price;
 						s.change_player(P, x, j);
@@ -339,20 +379,30 @@ bool improve2(Alignment& s) {
 	return false;
 }
 
+
+/* FUNCIO local_search
+	- Requereix una primera aproximacio de solucio per millorar.
+
+	- Crida un nombre fitat de vegades a la funcio BasicLocalSearch
+	  o improve per millorar la aproximacio donada.
+*/
 void local_search(Alignment& s) {
 	Alignment best = s;
-	/*for (int i = 0; improve1(s) and i < 1000; ++i) {
-		if (s.total_points > best.total_points) best = s;
-	}*/
 
-	for (int i = 0; improve2(s) and i < 1000; ++i) {
+	/*
+	for (int i = 0; Basic_local_search(s) and i < 1000; ++i) {
+		if (s.total_points > best.total_points) best = s;
+	}
+	*/
+
+	for (int i = 0; improve(s) and i < 500; ++i) {
 		if (s.total_points > best.total_points) best = s;
 	}
 
 	s = best;
 }
 
-// ************ METAHEURISTICA: FASE 2 *********************
+// ************ GRASP: FASE 2 *********************
 
 /* FUNCIO rec
 	- Requereix d'un index posicio i un identificador id, ambdos enters.
@@ -361,6 +411,8 @@ void local_search(Alignment& s) {
 
 	- Aquesta funcio emplena amb les 24 permutacions de {0,1,2,3}
 	  la matriu permutations.
+
+	- Nota: es un backtracking normal.
 */
 void rec(int pos, int& id) {
 	if (pos == 4) {
@@ -386,55 +438,60 @@ void rec(int pos, int& id) {
 		les calcula i les guarda.
 */
 void fill_permutations() {
-	// matriu permutations: a cada fila guarda una permutacio de {0,1,2,3}.
+	// Matriu permutations: a cada fila guarda una permutacio de {0,1,2,3}.
 	permutations = vector<vector<int>> (24, vector<int> (4));
-	// vector auxiliar vec: guarda cada permutacio mentre es construeix.
+	// Vector auxiliar vec: guarda cada permutacio mentre es construeix.
 	vec = vector<int> (4);
-	// vector auxiliar used: guarda quins nombres hi ha al vector vec.
+	// Vector auxiliar used: guarda quins nombres hi ha al vector vec.
 	used = vector<bool> (4, false);
-	// enter id: guarda quantes permutacions s'ha trobat en cada moment.
+	// Enter id: guarda quantes permutacions s'ha trobat en cada moment.
 	int id = 0;
 
-	// crida a la funcio que emplena la matriu de pemutacions.
+	// Crida a la funcio que emplena la matriu de pemutacions.
 	rec(0, id);
 }
 
+/* FUNCIO metaheuristic
+	- Requeix la alineacio la qual vols que maximitzi el nombre de punts.
 
+	- Aquesta funcio segueix un algoritme GRASP de la seguent manera:
+		- Es genera totes les permutacions de {0,1,2,3} que sera l'ordre el
+		  qual segueixi la funcio construct_greedy_randomized_solution per
+			realitzar la construccio d'una primera aproximacio.
+		- Aleshores per cadascuna de les permutacions, genera la primera
+		  aproximacio ja esmentada, a continuacio la millora amb un algoritme
+			de local_search.
+		- Es guarda sempre la millor en el parametre d'entrada.
+
+	- Intecio:
+		- D'aquesta manera, l'algoritme genera 24 solucions força difernts
+		  on cada una prioritza mes unes posicions que altres. Aixi quan la
+			funcio local_search aconsegueixi un minim local, aquests estaran
+			distribuits i hi ha mes probabilitat d'obtenir solucions millors.
+
+*/
 void metaheuristic(Alignment& bestTeam) {
+	// Alineacio auxiliar.
 	Alignment s(n1, n2, n3);
 
 	// Crida a la funcio que emplena la matriu de permutacions.
 	fill_permutations();
 
-
+	// Ordenem cadascuna de les bases de jugadors.
 	for (int k = 0; k < 4; ++k)
 		sort(PlayerDatabase[k].begin(), PlayerDatabase[k].end());
 
-
+	// Ens guardem el pressupost, per anar-lo reestablint cada iteracio.
 	int budget = t;
 
+	// Itera per cada permutacio de {0,1,2,3}.
   for (int i = 0; i < 24; ++i) {
-		t = budget;
-    s = construct_greedy_randomized_solution(i);
-
-		//cout << "i: " << i << endl;
-
-		//cout << "PUNTS: " << s.total_points << endl;
-
-		//cout << "PREU: " << s.total_price << endl;
-
-		//cout << "t: " << t << endl;
-		//cout << "DIFERENCIA: " << hhhhhhhhhhhhh - s.total_price << endl;
-    local_search(s);
-		//cout << "PUNTS: " << s.total_points << endl;
-
-		//cout << "PREU: " << s.total_price << endl;
-
-		//cout << "t: " << t << endl;
-		//cout << "DIFERENCIA: " << hhhhhhhhhhhhh - s.total_price << endl;
+		t = budget; // Reestableix el pressupost al inicial.
+    s = construct_greedy_randomized_solution(i); // Genera primera aproximacio.
+    local_search(s); // Millora l'aproximacio i la guarda si es la millor.
     if (s.total_points > bestTeam.total_points) bestTeam = s;
   }
-}
+}cd
 
 
 // ************ FUNCIO MAIN **************
@@ -458,14 +515,8 @@ int main(int argc, char** argv) {
   // Deduim quina es la millor alineacio que podem trobar.
 	Alignment bestTeam(n1, n2, n3);
 	metaheuristic(bestTeam);
-  // Escrivim la solucio en el fitxer de sortida.
+
+	// Escrivim la solucio en el fitxer de sortida.
   write(output_file_name, bestTeam);
 
-	/*cout << bestTeam.total_points << endl;
-	cout << hhhhhhhhhhhhh << " - " << bestTeam.total_price << " = " <<
-	 				hhhhhhhhhhhhh - bestTeam.total_price << endl;*/
 }
-/*
-Els optims que anteriorment es trobaven aqui
-son ara al fitxer projecte/mh_outputs/previous_summary.txt
-*/
