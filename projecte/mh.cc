@@ -449,9 +449,15 @@ int main(int argc, char** argv) {
 	 				hhhhhhhhhhhhh - bestTeam.total_price << endl;
 }
 /*
-
-
-
-
-
+1211204
+1211854
+1211860
+1211361
+1211169
+1212182
+1211307
+1212535
+1211012
+1212568
+1209991
 */
