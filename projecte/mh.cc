@@ -56,9 +56,14 @@ struct Player {
 	*/
 	bool operator< (const Player& J) {
 
-		if (price == 0) return false;
+
+		return (1.5*double(points)   - 0.8*1e8*double(1)/(j - price)) >
+					 (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
+
+
+		/*if (price == 0) return false;
 		if (J.price == 0) return true;
-		return points> J.points;
+		return points > J.points;*/
 
 		/*
 		if (mu_tot < 1e6) {
@@ -69,7 +74,7 @@ struct Player {
 						 double(J.points*J.points)/pow(log(J.price), 16);
 		}
 		return (1.5*double(points)   - 0.8*1e8*double(1)/(j - price)) >
-					 (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price
+					 (1.5*double(J.points) - 0.8*1e8*double(1)/(j - J.price));
 		*/
 	}
 };
@@ -329,9 +334,9 @@ bool improve2(Alignment& s) {
 
 void local_search(Alignment& s) {
 	Alignment best = s;
-	for (int i = 0; improve1(s) and i < 1000; ++i) {
+	/*for (int i = 0; improve1(s) and i < 1000; ++i) {
 		if (s.total_points > best.total_points) best = s;
-	}
+	}*/
 
 
 	for (int i = 0; improve2(s) and i < 100; ++i) {
@@ -449,15 +454,6 @@ int main(int argc, char** argv) {
 	 				hhhhhhhhhhhhh - bestTeam.total_price << endl;
 }
 /*
-1211204
-1211854
-1211860
-1211361
-1211169
-1212182
-1211307
-1212535
-1211012
-1212568
-1209991
+Els optims que anteriorment es trobaven aqui
+son ara al fitxer projecte/mh_outputs/previous_summary.txt
 */
