@@ -233,7 +233,7 @@ Player select_element_at_random(int x, vector<int>& RCL) {
 	// Omplim el vector weights amb els scores
 	// donats a cada membre de la RCL.
 	for (int i = 0; i < (int)RCL.size(); ++i) {
-		weights.push_back(PlayerDatabase[x][RCL[i]].points/1000000);
+		weights.push_back(PlayerDatabase[x][RCL[i]].points);
 	}
 	// FABRIQUEM FUNCIO DE DISTRIBUCIO
 	discrete_distribution<int> d(weights.begin(), weights.end());
@@ -241,10 +241,10 @@ Player select_element_at_random(int x, vector<int>& RCL) {
 	// ESCOLLIM UN AL ATZAR
 	int chosen_at_random = d(gen);
 
-	t -= PlayerDatabase[x][RCL[chosen_at_random ]].price;
+	t -= PlayerDatabase[x][RCL[chosen_at_random]].price;
 
 	// RETORNEM JUGADOR
-	return PlayerDatabase[x][chosen_at_random];
+	return PlayerDatabase[x][RCL[chosen_at_random]];
 }
 
 Alignment construt_greedy_randomized_solution(int id_perm) {
@@ -402,7 +402,8 @@ void metaheuristic(Alignment& bestTeam) {
 		cout << "i: " << i << endl;
 		cout << "PUNTS: " << s.total_points << endl;
 		cout << "PREU: " << s.total_price << endl;
-		cout << t;
+		cout << "t: " << t << endl;
+		cout << "DIFERENCIA: " << hhhhhhhhhhhhh - s.total_price << endl;
     if (s.total_points > bestTeam.total_points) bestTeam = s;
   }
 }
