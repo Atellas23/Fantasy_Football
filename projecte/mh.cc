@@ -7,14 +7,15 @@
 
 // Aplicarem la metaheurística GRASP al nostre problema.
 
-// Importem la llibreria random, fonamental per a
+// Importem la llibreria random i cstdlib, fonamentals per a
 // l'esquema metaheurístic que hem decidit aplicar.
 #include <random>
+#include <cstdlib>
 
 using namespace std;
 
 // Definim els parametres d'entrada de les consultes com a variables globals.
-int n1, n2, n3, t, j;
+int n1, n2, n3, t, j, hhhhhhhhhhhhh;
 vector<int> num_pos;
 clock_t start_time;
 
@@ -111,10 +112,18 @@ struct Alignment {
 		- Requereix un jugador i la posicio en la que el vols possar.
 		- Actualitza els punts i el preu de l'equip.
 	*/
-	void add_player (const Player& J, int i) {
+	void add_player (const Player& J, int x) {
 		total_points += J.points;
 		total_price  += J.price;
-  	aln[i].push_back(J);
+  	aln[x].push_back(J);
+	}
+
+	void change_player (const Player& J, int x, int i) {
+		total_points -= aln[x][i].points;
+		total_price -= aln[x][i].price;
+		aln[x][i] = J;
+		total_points += aln[x][i].points;
+		total_price += aln[x][i].price;
 	}
 };
 
@@ -129,7 +138,6 @@ void write(string& filename, Alignment& A) {
 	out.setf(ios::fixed);
 	out.precision(1);
 	clock_t t = clock() - start_time;
-	cout << A[1].size() << endl;
 	out << double(t)/CLOCKS_PER_SEC << endl
 			<< "POR: " << A[0][0].name << endl
 			<< "DEF: ";
@@ -143,7 +151,6 @@ void write(string& filename, Alignment& A) {
 	out << endl
 			<< "Punts: " << A.total_points << endl
 			<< "Preu: "  << A.total_price << endl;
-  cout << "HHHHHHHHHH" << endl;
 	out.close();
 }
 
@@ -155,6 +162,7 @@ void read_query(string& filename) {
 	ifstream in(filename);
 	in >> n1 >> n2 >> n3 >> t >> j;
 	num_pos = {1, n1, n2, n3};
+	hhhhhhhhhhhhh = t;
 }
 
 /* FUNCIO read_database
@@ -183,10 +191,155 @@ void read_database(string& filename) {
   in.close();
 }
 
-// ********* FUNCIONS AUXILIARS **********
+// ******** METAHEURISTICA: PRELIMINARS **************
+
 vector<vector<int>> permutations;
 vector<int> vec;
 vector<bool> used;
+
+
+// ********* METAHEURISTICA: FASE 1 *******************
+vector<int> determine_candidate_list_length() {
+	vector<int> v;
+
+	// alfa pels porters
+	v.push_back(1+floor(PlayerDatabase[0].size()/10));
+	// alfa pels defenses
+	v.push_back(n1+floor(PlayerDatabase[1].size()/10));
+	// alfa pels migcampistes
+	v.push_back(n2+floor(PlayerDatabase[2].size()/10));
+	// alfa pels davanters
+	v.push_back(n3+floor(PlayerDatabase[3].size()/10));
+	return v;
+}
+
+vector<int> restricted_candidate_list(int x, int alpha) {
+	vector<int> v;
+	int i = 0;
+	while (alpha > 0 and i < (int)PlayerDatabase[x].size()) {
+		if (PlayerDatabase[x][i].price <= t) {
+			v.push_back(i);
+			--alpha;
+		}
+		++i;
+	}
+
+	return v;
+}
+
+Player select_element_at_random(int x, vector<int>& RCL) {
+	default_random_engine gen;
+	vector<double> weights;
+	// Omplim el vector weights amb els scores
+	// donats a cada membre de la RCL.
+	for (int i = 0; i < (int)RCL.size(); ++i) {
+		weights.push_back(PlayerDatabase[x][RCL[i]].points/1000000);
+	}
+	// FABRIQUEM FUNCIO DE DISTRIBUCIO
+	discrete_distribution<int> d(weights.begin(), weights.end());
+
+	// ESCOLLIM UN AL ATZAR
+	int chosen_at_random = d(gen);
+
+	t -= PlayerDatabase[x][RCL[chosen_at_random ]].price;
+
+	// RETORNEM JUGADOR
+	return PlayerDatabase[x][chosen_at_random];
+}
+
+Alignment construt_greedy_randomized_solution(int id_perm) {
+  Alignment s(n1, n2, n3);
+  vector<int> alpha = determine_candidate_list_length();
+	for (int x: permutations[id_perm]) {
+		for (int i = 0; i < num_pos[x]; ++i) {
+			vector<int> RCL = restricted_candidate_list(x, alpha[x]);
+			Player P = select_element_at_random(x, RCL);
+			s.add_player(P, P.npos);
+		}
+	}
+	return s;
+}
+
+// ************ METAHEURISTICA: CERCA LOCAL ****************
+
+bool improve1(Alignment& s) {
+	int r = rand() % 24; // Nombre aleatori del 0 al 23
+	for (int x: permutations[r]) {
+		for (int i = 0; i < (int)PlayerDatabase[x].size()/50; ++i) {
+			Player P = PlayerDatabase[x][i];
+			for (int j = 0; j < num_pos[x]; ++j) {
+				if (((P.points >= s[x][j].points and P.price < s[x][j].price) or
+				    (P.points > s[x][j].points and P.price <= s[x][j].price))
+						and (P.name != s[x][j].name)) {
+						s.change_player(P, x, j);
+						t -= P.price;
+						t += s[x][j].price;
+						return true;
+				}
+
+				if (P.price <= s[x][j].price*0.9 and P.points >= s[x][j].points*0.9) {
+					int prob = rand() % 1000;
+					if (prob > 950) {
+						s.change_player(P, x, j);
+						t -= P.price;
+						t += s[x][j].price;
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+bool improve2(Alignment& s) {
+	int r = rand() % 24; // Nombre aleatori del 0 al 23
+	for (int x: permutations[r]) {
+		for (int i = 0; i < (int)PlayerDatabase[x].size()/10; ++i) {
+			Player P = PlayerDatabase[x][i];
+			for (int j = 0; j < num_pos[x]; ++j) {
+				if (((P.points >= s[x][j].points and P.price < s[x][j].price + t) or
+				    (P.points > s[x][j].points and P.price <= s[x][j].price + t))
+						and (P.name != s[x][j].name)) {
+						t -= P.price;
+						t += s[x][j].price;
+						s.change_player(P, x, j);
+						return true;
+
+				}
+
+				if (P.price <= s[x][j].price*0.9 and P.points >= s[x][j].points*0.9) {
+					int prob = rand() % 1000;
+					if (prob > 999) {
+						t -= P.price;
+						t += s[x][j].price;
+						s.change_player(P, x, j);
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
+
+void local_search(Alignment& s) {
+	Alignment best = s;
+	for (int i = 0; improve1(s) and i < 100; ++i)
+		if (s.total_points > best.total_points) best = s;
+
+
+	for (int i = 0; improve2(s) and i < 1000; ++i)
+		if (s.total_points > best.total_points) best = s;
+
+	s = best;
+}
+
+// ************ METAHEURISTICA: FASE 2 *********************
 
 /* FUNCIO rec
 	- Requereix d'un index posicio i un identificador id, ambdos enters.
@@ -234,74 +387,23 @@ void fill_permutations() {
 }
 
 
-void local_search();
+void metaheuristic(Alignment& bestTeam) {
+	Alignment s(n1, n2, n3);
 
-
-vector<int> determine_candidate_list_length() {
-	vector<int> v;
-
-	// alfa pels porters
-	v.push_back(1+floor(PlayerDatabase[0].size()/10));
-	// alfa pels defenses
-	v.push_back(n1+floor(PlayerDatabase[1].size()/10));
-	// alfa pels migcampistes
-	v.push_back(n2+floor(PlayerDatabase[2].size()/10));
-	// alfa pels davanters
-	v.push_back(n3+floor(PlayerDatabase[3].size()/10));
-
-	return v;
-}
-
-vector<int> restricted_candidate_list(int x, int alpha) {
-	vector<int> v;
-	for (int i = 0; i < alpha; ++i)
-		if (PlayerDatabase[x][i].price < t) v.push_back(i);
-	return v;
-}
-
-Player select_element_at_random(int source, vector<int>& RCL) {
-	default_random_engine gen;
-	vector<double> weights;
-	// Omplim el vector weights amb els scores
-	// donats a cada membre de la RCL.
-	/*
-	for (coses in coses) do coses;
-	*/
-	// FABRIQUEM FUNCIO DE DISTRIBUCIO
-	discrete_distribution<int> d(weights.begin(), weights.end());
-	// ESCOLLIM UN AL ATZAR
-	int chosen_at_random = d(gen);
-	// RETORNEM JUGADOR
-	return PlayerDatabase[source][chosen_at_random];
-}
-
-Alignment construt_greedy_randomized_solution(int id_perm) {
-  Alignment s(n1, n2, n3, t, j);
-  vector<int> alpha = determine_candidate_list_length();
-
-	for (int x: permutations[id_perm]) {
-		for (int i = 0; i < num_pos[x]; ++i) {
-			vector<int> RCL = restricted_candidate_list(x, alpha[x]);
-			Player P = select_element_at_random(x, RCL);
-			s.add_player(P, P.npos);
-		}
-	}
-
-	return s;
-}
-
-
-// ******** FUNCIO METAHEURISTIC *********
-void metaheuristic() {
-	  Alignment s(n1, n2, n3, t, j);
-
-	// call of the functions that fills the pemutation matrix.
+	// Crida a la funcio que emplena la matriu de permutacions.
 	fill_permutations();
 
+	int budget = t;
+
   for (int i = 0; i < 24; ++i) {
+		t = budget;
     s = construt_greedy_randomized_solution(i);
-    // s = local_search(s);
-    // is_it_better(s);
+    local_search(s);
+		cout << "i: " << i << endl;
+		cout << "PUNTS: " << s.total_points << endl;
+		cout << "PREU: " << s.total_price << endl;
+		cout << t
+    if (s.total_points > bestTeam.total_points) bestTeam = s;
   }
 }
 
@@ -326,9 +428,11 @@ int main(int argc, char** argv) {
 
   // Deduim quina es la millor alineacio que podem trobar.
 	Alignment bestTeam(n1, n2, n3);
-
-
+	metaheuristic(bestTeam);
   // Escrivim la solucio en el fitxer de sortida.
-  // write(output_file_name, bestTeam);
+  write(output_file_name, bestTeam);
 
+	cout << bestTeam.total_points << endl;
+	cout << hhhhhhhhhhhhh << " - " << bestTeam.total_price << " = " <<
+	 				hhhhhhhhhhhhh - bestTeam.total_price << endl;
 }
