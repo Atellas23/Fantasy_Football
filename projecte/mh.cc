@@ -345,7 +345,6 @@ Alignment shuffle_in_neighbourhood(const Alignment& s)
 		string comentari_vistos =
 "CANVIAR EL JUGADOR DE L'INDEX RAND_IDX DE L'ALINEACIO PEL JUGADOR TRIAT"
 "ALEATORIAMENT DE LA SEVA BASE DE DADES";
-
 		res.change_player(P, x, );
 	}
 	return res;
