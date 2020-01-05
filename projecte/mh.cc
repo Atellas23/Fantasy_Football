@@ -15,7 +15,7 @@
 using namespace std;
 
 // Definim els parametres d'entrada de les consultes com a variables globals.
-int n1, n2, n3, t, j, hhhhhhhhhhhhh;
+int n1, n2, n3, t, j;
 vector<int> num_pos;
 clock_t start_time;
 
@@ -170,7 +170,6 @@ void read_query(string& filename) {
 	ifstream in(filename);
 	in >> n1 >> n2 >> n3 >> t >> j;
 	num_pos = {1, n1, n2, n3};
-	hhhhhhhhhhhhh = t;
 }
 
 /* FUNCIO read_database
