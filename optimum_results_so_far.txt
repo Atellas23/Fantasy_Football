@@ -1,22 +1,22 @@
 projecte/query1.txt
-Punts: 1212772
+Punts: 1212877
 projecte/query2.txt
-Punts: 1212702
+Punts: 1213313
 projecte/query3.txt
-Punts: 1212157
+Punts: 1212936
 projecte/query4.txt
-Punts: 1211744
+Punts: 1211970
 projecte/query5.txt
-Punts: 1211314
+Punts: 1211797
 projecte/query6.txt
-Punts: 1213129
+Punts: 1213392
 projecte/query7.txt
-Punts: 1210681
+Punts: 1213050
 projecte/query8.txt
-Punts: 1211697
+Punts: 1212535
 projecte/query9.txt
-Punts: 1212279
+Punts: 1212803
 projecte/query10.txt
-Punts: 1212890
+Punts: 1213114
 projecte/query11.txt
-Punts: 1210148
+Punts: 1210623

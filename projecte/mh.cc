@@ -209,7 +209,7 @@ vector<bool> used;
 
 // ********* GRASP: FASE 1 *******************
 
-/* FUCNIO determine_candidate_list_length
+/* FUNCIO determine_candidate_list_length
 	- No requereix de cap parametre
 
 	- Retorna un vector de 4 elements amb el nombre de jugadors
@@ -220,13 +220,13 @@ vector<int> determine_candidate_list_length() {
 	vector<int> v;
 
 	// alfa pels porters
-	v.push_back(1+floor(PlayerDatabase[0].size()/50));
+	v.push_back(1+PlayerDatabase[0].size()/50);
 	// alfa pels defenses
-	v.push_back(n1+floor(PlayerDatabase[1].size()/50));
+	v.push_back(n1+PlayerDatabase[1].size()/50);
 	// alfa pels migcampistes
-	v.push_back(n2+floor(PlayerDatabase[2].size()/50));
+	v.push_back(n2+PlayerDatabase[2].size()/50);
 	// alfa pels davanters
-	v.push_back(n3+floor(PlayerDatabase[3].size()/50));
+	v.push_back(n3+PlayerDatabase[3].size()/50);
 	return v;
 }
 
@@ -255,7 +255,7 @@ vector<int> restricted_candidate_list(int x, int alpha) {
 
 /* FUNCIO select_element_at_random
 	- Requeix de la posicio dels jugadors x i la llista
-	  de jugadors candidats RCL.
+	  restringida de jugadors candidats, RCL.
 
 	- Escull aleatoriament un jugador de RCL, amb probabilitat
   	punts/suma(punts de tots els jugadors).
@@ -271,7 +271,12 @@ Player select_element_at_random(int x, vector<int>& RCL) {
 	}
 	// Fabriquem la funcio de distribucio.
 	discrete_distribution<int> d(weights.begin(), weights.end());
-
+	/*
+	Cal notar que la distribucio discrete_distribution<int> retorna un
+	nombre entre 0 i n-1, on n es el nombre d'elements en el rang
+	(weights.begin(), weights.end()), amb l'element i tenint probabilitat
+	weights[i]/suma(weights).
+	*/
 	// Escollim un jugador a l'altzar
 	int chosen_at_random = d(gen);
 
@@ -285,7 +290,7 @@ Player select_element_at_random(int x, vector<int>& RCL) {
 /* FUNCIO construct_greedy_randomized_solution
 	- Requeix de l'index de la permutacio que fara servir.
 
-	- Es la funcio principal de la FASE 2. Construix una
+	- Es la funcio principal de la FASE 1. Construeix una
 	  Alineacio inicial que aproxima la solucio.
 
 */
@@ -339,16 +344,17 @@ bool Basic_local_search(Alignment& s) {
 
 	- Es tracte d'una cerca local (semblant a Simulated Annealing)
 	  la qual canvia l'alineacio donada per, o bé, una
-		alineacio estricatament millor, o bé, amb una petita probabilitat,
-		amb una alineacio una mica pitjor.
+		alineacio estrictament millor, o bé, amb una petita probabilitat,
+		amb una alineacio una mica pitjor, per aixi poder-se escapar dels
+		optims locals i poder aproximar-se a un optim global.
 
 */
 bool improve (Alignment& s) {
 	int r = rand() % 24; // Nombre aleatori del 0 al 23
 
-	// Primer permuta per cada posicio.
+	// Primer itera per cada posicio.
 	for (int x: permutations[r]) {
-		// Segon permuta pels primers jugadors de la base de dades.
+		// Segon itera sobre els primers jugadors de la base de dades.
 		for (int i = 0; i < (int)PlayerDatabase[x].size()/100; ++i) {
 			Player P = PlayerDatabase[x][i];
 			for (int j = 0; j < num_pos[x]; ++j) {
@@ -405,7 +411,7 @@ void local_search(Alignment& s) {
 // ************ GRASP: FASE 2 *********************
 
 /* FUNCIO rec
-	- Requereix d'un index posicio i un identificador id, ambdos enters.
+	- Requereix d'un index posicio i d'un identificador id, ambdos enters.
 	- pos: guarda fins a quina posicio esta construida una permutacio nova a vec.
 	- id: guarda per quina permutacio anem.
 
@@ -452,19 +458,19 @@ void fill_permutations() {
 }
 
 /* FUNCIO metaheuristic
-	- Requeix la alineacio la qual vols que maximitzi el nombre de punts.
+	- Requereix l'alineacio de la qual es vol maximitzar el nombre de punts.
 
 	- Aquesta funcio segueix un algoritme GRASP de la seguent manera:
-		- Es genera totes les permutacions de {0,1,2,3} que sera l'ordre el
-		  qual segueixi la funcio construct_greedy_randomized_solution per
+		- Es genera totes les permutacions de {0,1,2,3}: aquestes seran l'ordre
+		  que seguira la funcio construct_greedy_randomized_solution per
 			realitzar la construccio d'una primera aproximacio.
 		- Aleshores per cadascuna de les permutacions, genera la primera
 		  aproximacio ja esmentada, a continuacio la millora amb un algoritme
-			de local_search.
+			de cerca local.
 		- Es guarda sempre la millor en el parametre d'entrada.
 
-	- Intecio:
-		- D'aquesta manera, l'algoritme genera 24 solucions força difernts
+	- Intencio:
+		- D'aquesta manera, l'algoritme genera 24 solucions força diferents
 		  on cada una prioritza mes unes posicions que altres. Aixi quan la
 			funcio local_search aconsegueixi un minim local, aquests estaran
 			distribuits i hi ha mes probabilitat d'obtenir solucions millors.
@@ -491,7 +497,7 @@ void metaheuristic(Alignment& bestTeam) {
     local_search(s); // Millora l'aproximacio i la guarda si es la millor.
     if (s.total_points > bestTeam.total_points) bestTeam = s;
   }
-}cd
+}
 
 
 // ************ FUNCIO MAIN **************
@@ -506,7 +512,7 @@ int main(int argc, char** argv) {
 
   // Llegim les dades d'entrada a traves dels fitxers proporcionats.
 	string input_file_name = argv[1], query_file_name = argv[2],
-          output_file_name = argv[3];
+         output_file_name = argv[3];
 	read_query(query_file_name);
 	read_database(input_file_name);
 

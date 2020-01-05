@@ -22,9 +22,18 @@ int main() {
     system(("echo projecte/query" + to_string(i) + ".txt >> projecte/mh_outputs/summary_so_far.txt").c_str());
     string command2 = "grep \"Punts:\" " + where + " >> projecte/mh_outputs/summary_so_far.txt";
     system(command2.c_str());
-    //system("echo \n >> summary_so_far.txt");
   }
-  system("pr -m -t projecte/mh_outputs/outputs_max.txt projecte/mh_outputs/summary_so_far.txt");
+  system("pr -m -t projecte/mh_outputs/summary_so_far.txt");
+
+  for (int i = 1; i < 12; ++i) {
+    string command = "./projecte/checker_v2 ";
+    string where = output + to_string(i) + ".txt";
+    command += database + to_string(i) + ".txt "
+    + query + to_string(i) + ".txt "
+    + where;
+    system(command.c_str());
+  }
+  cout << "All the results checked!\n";
   /*
   vector<int> points1, points2;
   ifstream in1("FITXER.txt"), in2("FITXER2.txt");
