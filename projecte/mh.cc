@@ -497,7 +497,11 @@ void metaheuristic(Alignment& bestTeam) {
 		t = budget; // Reestableix el pressupost al inicial.
     s = construct_greedy_randomized_solution(i); // Genera primera aproximacio.
     local_search(s); // Millora l'aproximacio i la guarda si es la millor.
-    if (s.total_points > bestTeam.total_points) bestTeam = s;
+    if (s.total_points > bestTeam.total_points) {
+			bestTeam = s;
+			// Escrivim la solucio en el fitxer de sortida.
+			write(output_file_name, bestTeam);
+		}
   }
 }
 
@@ -523,8 +527,4 @@ int main(int argc, char** argv) {
   // Deduim quina es la millor alineacio que podem trobar.
 	Alignment bestTeam(n1, n2, n3);
 	metaheuristic(bestTeam);
-
-	// Escrivim la solucio en el fitxer de sortida.
-  write(output_file_name, bestTeam);
-
 }
