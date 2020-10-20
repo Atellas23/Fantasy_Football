@@ -1,22 +1,6 @@
-# AP3_Fantasy_Football
-## Coses que funcionen
-### `driver.cc` :
-`driver.cc` és un programa que compila i executa l'arxiu `greedy.cc` sobre la base de dades `data_base.txt` i totes les consultes dins de la carpeta `public_benchs` .
-### Comentaris
-ALEX: he escrit aquestes merdes perque ho llegeixis a veure que en penses
-1. igual que 3, son les millors pels hard
-return double(points*points*points)+double(1)/(price+1) > double(J.points*J.points*J.points)+double(1.0)/(J.price+1);
-2. millora en mes del 60% pero em molesta
-return double(points*points*points)/(pow(log(price + 2),1.25)) > double(J.points*J.points*J.points)/pow(log(J.price + 2),1.25);
-3. funciona igual de be que 1
-if (points == J.points) return price < J.price;
-return points > J.points;
-COM A CONCLUSIO: diria que si ho provem amb les bases de dades per la
-                    metaheuristica sortirem de dubtes, ja que tindrem mes
-                    merda per comparar.
-4. ho provem amb el preu per jugador
-cout << (double(points*points*points)) << " " << (double(1)/(j - price)) << endl;
-ALEIX: he posat uns coeficients que equilibren, milloren bastant els easy pero empitjoren poquet els medium
-Aquestes comparacions son inutils pero jo optaria per posar-les en el que entreguem
-if (j == price) return true;
-if (j == J.price) return false;
+# AP3: Fantasy Football
+This repository hosts a course project from Algorithms & Programming 3 (AP3) within the Bachelor's degree in Data Science and Engineering at Universitat Politècnica de Catalunya ([dse.upc.edu](https://dse.upc.edu/en)). It consisted of maximizing the total quantity of points of a fantasy football team. We were given a database of several football players, each with a price, a number indicating its points and a position, and we were required to develop algorithms to find an "optimal" team  within the following constraints: the team could not cost more than a certain amount T, and each player's price could not exceed another given value, J. Also, the teams found had to fulfill the chosen distribution of players, given in each query file together with T and J, thereby setting a kind-of multi-dimensional Knapsack problem. The whole project is completely described in `projecte/projecte.pdf ` (only in catalan).
+
+To solve this problems, we were required to implement an exhaustive search algorithm using backtracking, a greedy algorithm and a metaheuristic different than Basic Local Search to find these "optimal" teams. Then, apart from these implementations, my partner @AlferesChronos and I also developed an automated testing program, `driver.cc`, that tested the programs for every test we had available in `public_benchs` (`exh.cc` and `greedy.cc`) and `diff_benchs` (`mh.cc`), and (in a previous version) showed us how much we had refined our solution from the previous implementation's results.
+
+In the metaheuristic implementation, we applied a modified GRASP (Greedy Randomized Adaptive Search Procedure) metaheuristic, which applies a randomly modified greedy heuristic to a resticted candidate list chosen from the top of the players, ordered in a certain way, and then tries to improve the solution using a local search procedure. Through trial and error, and a little bit of reasoning too, we found a particular way to order the players at the start of the program of the procedure that gave us outstanding results when compared with our peers' results. We used as the local search a kind of simmulated annealing procedure, although the probability of changing the given solution did not change through time.
